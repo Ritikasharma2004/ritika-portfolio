@@ -1,0 +1,17 @@
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / tooling
+prepros-6.config
+.vscode/
+.idea/
+
+# Claude Code local config
+.claude/
+
+# Dependencies / build output
+node_modules/
+.sass-cache/
+
