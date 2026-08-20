@@ -67,7 +67,7 @@
               <div class="label">Certs</div>
             </div>
             <div>
-              <div class="num" data-count="3">0</div>
+              <div class="num" data-count="6">0</div>
               <div class="label">Projects</div>
             </div>
             <div>
@@ -246,7 +246,7 @@
         <div class="section-head reveal">
           <span class="eyebrow">Projects</span>
           <h2>Things I've built</h2>
-          <p>End-to-end data analytics projects using SQL, Python & Power BI.</p>
+          <p>End-to-end analytics projects on real public datasets — Python for the pipeline, SQL for the analysis, Power BI and Streamlit for the reporting.</p>
         </div>
         <div class="project-grid">
           <div class="project-card reveal">
@@ -293,6 +293,57 @@
                 <li>Used window functions, CTEs and running totals to show that the top 10 publishers hold 70.5% of the market.</li>
               </ul>
               <a href="https://github.com/Ritikasharma2004/vgsales-sql-analysis" class="btn btn-outline" target="_blank" rel="noopener">View on GitHub</a>
+            </div>
+          </div>
+
+          <div class="project-card reveal">
+            <div class="project-banner c">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            </div>
+            <div class="project-body">
+              <h3>India Economic Indicators &amp; Forecasting</h3>
+              <span class="project-date">Aug 2026 · Python, SQL, Streamlit</span>
+              <ul>
+                <li>Built an end-to-end pipeline ingesting 11 World Bank indicators (1960–2025) live from the API, with automated data-quality reporting.</li>
+                <li>Compared 5 forecasting models under walk-forward validation and found that <strong>no machine learning model beat a simple mean baseline</strong> — then showed why, using an ADF test and a lag-1 autocorrelation of 0.026.</li>
+                <li>Wrote 13 tests including explicit data-leakage checks on every lagged feature.</li>
+              </ul>
+              <div class="tag-row"><span class="tag">Python</span><span class="tag">scikit-learn</span><span class="tag">SQL</span><span class="tag">Streamlit</span></div>
+              <a href="https://github.com/Ritikasharma2004/india-economic-indicators" class="btn btn-outline" target="_blank" rel="noopener">View on GitHub</a>
+            </div>
+          </div>
+
+          <div class="project-card reveal">
+            <div class="project-banner d">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6-1.8A4 4 0 0 0 6 19z"/><line x1="8" y1="22" x2="8" y2="22.01"/><line x1="12" y1="22" x2="12" y2="22.01"/><line x1="16" y1="22" x2="16" y2="22.01"/></svg>
+            </div>
+            <div class="project-body">
+              <h3>India Air Quality — CPCB National AQI</h3>
+              <span class="project-date">Aug 2026 · Python, SQL, Streamlit</span>
+              <ul>
+                <li>Processed <strong>382,000 hourly pollutant readings</strong> into 15,936 city-days across 12 cities, implementing India's official CPCB AQI formula from specification rather than using a pre-calculated index.</li>
+                <li>Found the AQI-determining pollutant <strong>rotates seasonally</strong> — PM2.5 in winter, ozone and dust from March — which changes which interventions could move the index at all.</li>
+                <li>Showed the stubble-burning window rises <em>least</em> in the Indo-Gangetic Plain, and explained the ceiling effect behind it.</li>
+              </ul>
+              <div class="tag-row"><span class="tag">Python</span><span class="tag">pandas</span><span class="tag">SQL</span><span class="tag">Plotly</span></div>
+              <a href="https://github.com/Ritikasharma2004/india-air-quality" class="btn btn-outline" target="_blank" rel="noopener">View on GitHub</a>
+            </div>
+          </div>
+
+          <div class="project-card reveal">
+            <div class="project-banner e">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="project-body">
+              <h3>IPL Ball-by-Ball Analytics</h3>
+              <span class="project-date">Aug 2026 · Python, SQL, Streamlit</span>
+              <ul>
+                <li>Parsed <strong>295,557 deliveries</strong> from 1,243 matches (2008–2026) out of nested JSON into a clean analysis table, applying correct cricket scoring conventions throughout.</li>
+                <li>Measured the 2023 Impact Player rule at <strong>+1.13 runs per over</strong>, and showed the toss is near a coin flip (51.6%) while the decision after it is not — fielding wins 54.7% against batting's 45.3%.</li>
+                <li>Built a league-relative method for locating a batter's weakest phase, after showing the intuitive within-player comparison just measures the phase effect.</li>
+              </ul>
+              <div class="tag-row"><span class="tag">Python</span><span class="tag">SciPy</span><span class="tag">SQL</span><span class="tag">Streamlit</span></div>
+              <a href="https://github.com/Ritikasharma2004/ipl-analytics" class="btn btn-outline" target="_blank" rel="noopener">View on GitHub</a>
             </div>
           </div>
         </div>

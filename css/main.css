@@ -469,6 +469,9 @@ section { padding: 96px 0; }
 .project-banner svg { width: 42px; height: 42px; }
 .project-banner.a { background: linear-gradient(135deg, #10b981, #059669); }
 .project-banner.b { background: linear-gradient(135deg, #6366f1, #4338ca); }
+.project-banner.c { background: linear-gradient(135deg, #f59e0b, #b45309); }
+.project-banner.d { background: linear-gradient(135deg, #ef4444, #991b1b); }
+.project-banner.e { background: linear-gradient(135deg, #06b6d4, #0e7490); }
 .project-body { padding: 24px; }
 .project-body h3 { margin: 0 0 4px; font-size: 1.1rem; font-weight: 700; }
 .project-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; display: block; }
