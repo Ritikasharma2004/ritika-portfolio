@@ -8,9 +8,6 @@ prepros-6.config
 .vscode/
 .idea/
 
-# Claude Code local config
-.claude/
-
 # Dependencies / build output
 node_modules/
 .sass-cache/

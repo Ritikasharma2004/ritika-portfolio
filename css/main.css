@@ -472,6 +472,8 @@ section { padding: 96px 0; }
 .project-banner.c { background: linear-gradient(135deg, #f59e0b, #b45309); }
 .project-banner.d { background: linear-gradient(135deg, #ef4444, #991b1b); }
 .project-banner.e { background: linear-gradient(135deg, #06b6d4, #0e7490); }
+.project-banner.f { background: linear-gradient(135deg, #a855f7, #6b21a8); }
+.project-banner.g { background: linear-gradient(135deg, #0ea5e9, #0c4a6e); }
 .project-body { padding: 24px; }
 .project-body h3 { margin: 0 0 4px; font-size: 1.1rem; font-weight: 700; }
 .project-date { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; display: block; }

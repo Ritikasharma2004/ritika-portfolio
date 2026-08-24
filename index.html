@@ -7,7 +7,7 @@
   <meta name="description" content="Ritika Sharma — Data Analyst working across SQL, Python, Power BI, DAX, and Excel. Turning raw data into decision-ready insights.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
-  <link rel="stylesheet" href="css/main.css?v=2">
+  <link rel="stylesheet" href="css/main.css?v=4">
 </head>
 <body>
 
@@ -67,7 +67,7 @@
               <div class="label">Certs</div>
             </div>
             <div>
-              <div class="num" data-count="6">0</div>
+              <div class="num" data-count="8">0</div>
               <div class="label">Projects</div>
             </div>
             <div>
@@ -346,6 +346,40 @@
               <a href="https://github.com/Ritikasharma2004/ipl-analytics" class="btn btn-outline" target="_blank" rel="noopener">View on GitHub</a>
             </div>
           </div>
+
+          <div class="project-card reveal">
+            <div class="project-banner f">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6"/><path d="M10 3v6.2L4.9 18a2 2 0 0 0 1.7 3h10.8a2 2 0 0 0 1.7-3L14 9.2V3"/><path d="M7.2 14.5h9.6"/></svg>
+            </div>
+            <div class="project-body">
+              <h3>Mobile Game A/B Test — Gate Placement</h3>
+              <span class="project-date">Aug 2026 · Python, SciPy, SQL</span>
+              <ul>
+                <li>Analysed an A/B test on <strong>90,189 players</strong> that moved a game's first progression gate from level 30 to level 40, and found the later gate <strong>cut 7-day retention by 0.82pp</strong> (−4.3% relative, p = 0.0016).</li>
+                <li>Showed the widely-reported "no day-1 effect" is <strong>unmeasured rather than absent</strong> — the observed 0.59pp sits below the test's own 0.93pp minimum detectable effect, so it could never have been called either way.</li>
+                <li>Caught a sample ratio mismatch (p = 0.0086) before analysing, and an engagement gap that turned out to be <strong>96% one bot</strong> logging 49,854 rounds in 14 days.</li>
+              </ul>
+              <div class="tag-row"><span class="tag">Python</span><span class="tag">SciPy</span><span class="tag">statsmodels</span><span class="tag">SQL</span></div>
+              <a href="https://github.com/Ritikasharma2004/mobile-game-ab-test" class="btn btn-outline" target="_blank" rel="noopener">View on GitHub</a>
+            </div>
+          </div>
+
+          <div class="project-card reveal">
+            <div class="project-banner g">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 17.5h-6l-2-7h-2"/><path d="M9 10.5l3-5 3 5"/><circle cx="15" cy="5.5" r="1"/></svg>
+            </div>
+            <div class="project-body">
+              <h3>Chicago Bike-Share Rebalancing</h3>
+              <span class="project-date">Aug 2026 &middot; Python, SQL, Geospatial</span>
+              <ul>
+                <li>Analysed <strong>16,70,686 Divvy trips</strong> across three seasons, joined to every station's dock capacity, to answer where the rebalancing vans should go.</li>
+                <li>Found the obvious signal is useless — the median station nets <strong>zero</strong> bikes over a full day. Bikes move <strong>6.3x more within a day than across one</strong>, so rebalancing is a timing problem, not a volume one.</li>
+                <li>Showed a third of trips have no station because e-bikes are dockless, not because data is missing — and measured imbalance against dock capacity, surfacing 7-dock stations that lose <strong>56% of capacity</strong> before 9am and never appear in a volume ranking.</li>
+              </ul>
+              <div class="tag-row"><span class="tag">Python</span><span class="tag">pandas</span><span class="tag">SQL</span><span class="tag">Geospatial</span></div>
+              <a href="https://github.com/Ritikasharma2004/chicago-bike-rebalancing" class="btn btn-outline" target="_blank" rel="noopener">View on GitHub</a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -392,6 +426,6 @@
   </footer>
 
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-  <script src="js/site.js?v=2"></script>
+  <script src="js/site.js?v=4"></script>
 </body>
 </html>
