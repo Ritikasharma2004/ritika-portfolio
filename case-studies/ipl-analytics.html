@@ -65,6 +65,7 @@
         <a href="#conventions">Conventions</a>
         <a href="#findings">Findings</a>
         <a href="#method">The method finding</a>
+        <a href="#sql">The SQL</a>
         <a href="#recommend">Takeaways</a>
         <a href="#limits">Limitations</a>
       </div>
@@ -104,6 +105,10 @@
 
           <div class="finding">
             <h3><span class="n">1</span> Scoring has risen, and the Impact Player rule is visible in it</h3>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/ipl-analytics/01_season_trends.png" alt="IPL run rate, boundary percentage, dot percentage and sixes per match by season, 2008 to 2026" loading="lazy">
+              <figcaption><strong>Season trends, 2008–2026.</strong> All four series turn at the same point in 2023 — run rate and boundaries up, dots down, sixes sharply up.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th class="num">Season</th><th class="num">Matches</th><th class="num">Run rate</th><th class="num">Boundary %</th><th class="num">Dot %</th><th class="num">Sixes/match</th></tr></thead>
@@ -133,6 +138,10 @@
             <h3><span class="n">2</span> The toss is a coin flip. The decision after it is not</h3>
             <p>Across <strong>1,218 decided matches</strong>, the toss winner won 628 times — <strong>51.6%</strong>. A binomial test against a fair coin gives <strong>p = 0.289</strong>. Winning the toss confers no advantage distinguishable from chance.</p>
             <p>That headline conceals the actual effect entirely:</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/ipl-analytics/05_toss.png" alt="IPL toss winner win rate against the win rate by toss decision" loading="lazy">
+              <figcaption><strong>Toss outcome versus toss decision.</strong> Winning the toss is flat against a coin flip; choosing to field is not.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Toss decision</th><th class="num">Matches</th><th class="num">Win rate</th></tr></thead>
@@ -152,6 +161,10 @@
 
           <div class="finding">
             <h3><span class="n">3</span> The three phases are different games</h3>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/ipl-analytics/02_phase_evolution.png" alt="Evolution of IPL powerplay, middle and death over scoring rates across seasons" loading="lazy">
+              <figcaption><strong>Phase scoring across seasons.</strong> The three phases move roughly in parallel but never converge — the death premium is a permanent feature, not an artefact of one era.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Phase</th><th class="num">Balls</th><th class="num">Run rate</th><th class="num">Boundary %</th><th class="num">Dot %</th><th class="num">Balls per wicket</th></tr></thead>
@@ -168,6 +181,10 @@
 
           <div class="finding">
             <h3><span class="n">4</span> Death bowling, measured properly</h3>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/ipl-analytics/04_death_bowling.png" alt="Economy rate and dot ball percentage for the best IPL death bowlers" loading="lazy">
+              <figcaption><strong>Death bowling.</strong> Economy plotted against dot percentage — Narine and Malinga sit apart from the field on both axes at once.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Bowler</th><th class="num">Balls</th><th class="num">Economy</th><th class="num">Dot %</th><th class="num">Boundary %</th></tr></thead>
@@ -197,6 +214,10 @@
             <p>Compare each batter against the <strong>league average for that same phase</strong>, not against their own other phases. The question becomes "how does this batter do relative to what other batters manage in the same situation" — which is the question that was actually being asked.</p>
           </div>
           <p>Applied to every batter with 200+ balls in all three phases, the phase where their strike rate sits furthest below the league rate for that phase:</p>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/ipl-analytics/03_death_batting.png" alt="IPL batter strike rate at the death measured against the league average for that phase" loading="lazy">
+            <figcaption><strong>Death batting, league-relative.</strong> Measured against the league rate for the same phase, batters separate. Measured against their own powerplay numbers, they would not.</figcaption>
+          </figure>
           <div class="cs-table">
             <table>
               <thead><tr><th>Batter</th><th>Weakest phase</th><th class="num">Balls</th><th class="num">Their SR</th><th class="num">League SR</th><th class="num">Gap</th><th class="num">Dot %</th></tr></thead>
@@ -215,6 +236,57 @@
             </table>
           </div>
           <p>The <code class="inline">dot_pct</code> column shows most of the mechanism. Across all qualifying batter-phases, dot percentage correlates at <strong>−0.44</strong> with falling behind the league, against <strong>−0.33</strong> for survival (balls per dismissal). <strong>Strike rotation is the larger effect</strong>, but both are present — batters who fall behind tend to be playing more dot balls <em>and</em> getting out somewhat more often.</p>
+        </section>
+
+        <section class="cs-section" id="sql">
+          <h2>The SQL layer</h2>
+          <p class="sub">8 queries over a SQLite build of the ball-by-ball table</p>
+          <p>The scoring conventions are enforced in the schema comment and then applied consistently in every query, so a reader can see which rule produced which denominator:</p>
+          <div class="cs-code"><pre><span class="c">-- Tables: deliveries(match_id, season_year, venue, innings, batting_team,
+--                    bowling_team, over, ball_in_over, phase, batter, bowler,
+--                    runs_batter, runs_total, wides, noballs, byes, legbyes,
+--                    is_legal_delivery, is_four, is_six, is_dot, is_wicket, ...)
+--
+-- Scoring conventions, applied consistently below:
+--   balls faced   = wides excluded, no-balls included
+--   balls bowled  = wides and no-balls both excluded
+--   runs conceded = byes and leg-byes excluded</span></pre></div>
+          <p>The league-relative comparison from the method finding is one query. A window function supplies the league rate for each phase <em>alongside</em> each batter's own rate, so the comparison happens in a single pass rather than needing a self-join against a separately computed average:</p>
+          <div class="cs-code"><pre><span class="c">-- Q3. Batter strike rate by phase, against the league average for that phase
+-- A window function supplies the league rate alongside each batter's own,
+-- so the comparison happens in one pass.</span>
+<span class="k">WITH</span> batter_phase <span class="k">AS</span> (
+    <span class="k">SELECT</span>
+        batter,
+        phase,
+        <span class="k">COUNT</span>(*)                                      <span class="k">AS</span> balls_faced,
+        <span class="k">SUM</span>(runs_batter)                              <span class="k">AS</span> runs,
+        <span class="k">SUM</span>(is_wicket)                                <span class="k">AS</span> dismissals,
+        <span class="k">ROUND</span>(<span class="s">100.0</span> * <span class="k">SUM</span>(runs_batter) / <span class="k">COUNT</span>(*), <span class="s">1</span>) <span class="k">AS</span> strike_rate
+    <span class="k">FROM</span> deliveries
+    <span class="k">WHERE</span> is_super_over = <span class="s">0</span>
+      <span class="k">AND</span> wides = <span class="s">0</span>            <span class="c">-- a wide is not a ball faced</span>
+    <span class="k">GROUP BY</span> batter, phase
+    <span class="k">HAVING</span> <span class="k">COUNT</span>(*) &gt;= <span class="s">200</span>
+),
+with_league <span class="k">AS</span> (
+    <span class="k">SELECT</span>
+        bp.*,
+        <span class="k">ROUND</span>(
+            <span class="k">AVG</span>(bp.strike_rate) <span class="k">OVER</span> (<span class="k">PARTITION BY</span> bp.phase), <span class="s">1</span>
+        ) <span class="k">AS</span> league_avg_sr
+    <span class="k">FROM</span> batter_phase bp
+)
+<span class="k">SELECT</span>
+    batter,
+    phase,
+    balls_faced,
+    strike_rate,
+    league_avg_sr,
+    <span class="k">ROUND</span>(strike_rate - league_avg_sr, <span class="s">1</span>) <span class="k">AS</span> sr_vs_league
+<span class="k">FROM</span> with_league
+<span class="k">ORDER BY</span> sr_vs_league;</pre></div>
+          <p>Two details carry the correctness. <code class="inline">wides = 0</code> implements "a wide is not a ball faced" at the row level rather than correcting afterwards, and <code class="inline">PARTITION BY phase</code> is what makes the benchmark phase-specific — without it every batter would be compared against one blended league rate and the whole method finding would collapse back into measuring the phase effect.</p>
         </section>
 
         <section class="cs-section" id="recommend">

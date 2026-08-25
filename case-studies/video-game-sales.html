@@ -124,6 +124,10 @@
           <div class="finding">
             <h3><span class="n">1</span> The market is extraordinarily concentrated</h3>
             <p>A running total over publisher sales, ordered by size, gives the cumulative market share curve:</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/video-game-sales/01_concentration.png" alt="Cumulative market share curve rising steeply across the top twenty publishers" loading="lazy">
+              <figcaption><strong>Cumulative market share by publisher rank.</strong> The curve is almost vertical at the start and flattens quickly — the signature of a market where a handful of names hold most of it.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th class="num">Rank</th><th>Publisher</th><th class="num">Sales (M units)</th><th class="num">Cumulative share</th></tr></thead>
@@ -144,6 +148,10 @@
           <div class="finding">
             <h3><span class="n">2</span> Sales follow a Pareto distribution, so averages lie</h3>
             <p>Splitting all 16,327 titles into quartiles by units sold, using <code class="inline">NTILE(4)</code>:</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/video-game-sales/02_pareto.png" alt="Sales share by quartile alongside total sales versus sales per title by genre" loading="lazy">
+              <figcaption><strong>Left:</strong> the top quartile of titles produces four fifths of all sales. <strong>Right:</strong> the same genres ranked two ways — by total sales and by sales per title — showing how far the two orderings diverge.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Quartile</th><th class="num">Games</th><th class="num">Sales range (M)</th><th class="num">Share of all sales</th></tr></thead>
@@ -164,6 +172,10 @@
           <div class="finding">
             <h3><span class="n">3</span> Japan is a structurally different market</h3>
             <p>Comparing each genre's share of Japanese sales against its share of North American sales. If the two markets had the same taste, every difference would be near zero. They do not:</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/video-game-sales/03_japan.png" alt="Difference between Japanese and North American genre shares, with only Role-Playing positive" loading="lazy">
+              <figcaption><strong>Japan share minus North America share, by genre.</strong> One bar points right. A catalogue built for the North American market is built around the genres Japan buys least.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Genre</th><th class="num">Japan share − NA share</th></tr></thead>

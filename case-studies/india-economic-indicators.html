@@ -66,6 +66,7 @@
         <a href="#findings">Structural findings</a>
         <a href="#forecast">The forecast</a>
         <a href="#why">Why it failed</a>
+        <a href="#sql">The SQL</a>
         <a href="#recommend">Recommendations</a>
         <a href="#limits">Limitations</a>
       </div>
@@ -105,7 +106,17 @@
 
           <div class="finding">
             <h3><span class="n">1</span> Liberalisation changed the level of growth <em>and</em> its reliability</h3>
-            <div class="cs-table">
+            
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-economic-indicators/01_growth_timeline.png" alt="India GDP growth rate 1961-2025 with the 1991 liberalisation marked" loading="lazy">
+            <figcaption><strong>Annual GDP growth, 1961–2025.</strong> The 1991 liberalisation splits the series: the level rises and the swings narrow.</figcaption>
+          </figure>
+
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-economic-indicators/05_rolling_volatility.png" alt="Rolling standard deviation of India GDP growth over time" loading="lazy">
+            <figcaption><strong>Rolling volatility.</strong> The same story as the table below — post-1991 growth is not just higher, it is steadier.</figcaption>
+          </figure>
+          <div class="cs-table">
               <table>
                 <thead><tr><th>Era</th><th class="num">Years</th><th class="num">Mean growth</th><th class="num">Volatility (sd)</th></tr></thead>
                 <tbody>
@@ -120,7 +131,12 @@
 
           <div class="finding">
             <h3><span class="n">2</span> India moved from agriculture to services, skipping industry</h3>
-            <div class="cs-table">
+            
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-economic-indicators/04_sector_structure.png" alt="Agriculture, industry and services as a share of India GDP by decade" loading="lazy">
+            <figcaption><strong>Sector shares of GDP.</strong> Agriculture falls 23 points, services absorb almost all of it, and industry stays flat across sixty years.</figcaption>
+          </figure>
+          <div class="cs-table">
               <table>
                 <thead><tr><th>Decade</th><th class="num">Agriculture</th><th class="num">Industry</th><th class="num">Services</th></tr></thead>
                 <tbody>
@@ -204,7 +220,12 @@
 
           <div class="finding">
             <h3><span class="n">1</span> Growth is stationary white noise around a constant mean</h3>
-            <p>This is the single most important number in the project. An Augmented Dickey-Fuller test rejects non-stationarity decisively (<strong>statistic −7.65, p &lt; 0.0001</strong>), and the <strong>lag-1 autocorrelation is 0.026</strong> — effectively zero.</p>
+            
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-economic-indicators/02_growth_distribution.png" alt="Distribution of India annual GDP growth rates" loading="lazy">
+            <figcaption><strong>Distribution of annual growth.</strong> Tight and roughly symmetric around a stable central value — the shape of a series that scatters around a constant mean rather than trending or persisting.</figcaption>
+          </figure>
+          <p>This is the single most important number in the project. An Augmented Dickey-Fuller test rejects non-stationarity decisively (<strong>statistic −7.65, p &lt; 0.0001</strong>), and the <strong>lag-1 autocorrelation is 0.026</strong> — effectively zero.</p>
             <p>Last year's growth carries almost no information about this year's. That single fact dooms the entire modelling approach: lag features cannot work when there is no serial dependence for them to capture. It also explains the shape of the scoreboard — shocks like 1965, 1979 and 2020 are severe but do not persist, which is exactly why the naive carry-forward forecast is the <em>worst</em> baseline while the mean is the best.</p>
           </div>
 
@@ -215,7 +236,12 @@
 
           <div class="finding">
             <h3><span class="n">3</span> The predictors are weak before they are even lagged</h3>
-            <p>The strongest same-year correlation with growth across 1991–2025 is <strong>−0.24</strong> (trade balance). Lagging these variables, as honest forecasting requires, weakens them further. There was never much signal to extract.</p>
+            
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-economic-indicators/03_correlation_heatmap.png" alt="Correlation heatmap of India macroeconomic indicators" loading="lazy">
+            <figcaption><strong>Correlation matrix across all 11 indicators.</strong> The GDP-growth row is the relevant one, and it is almost empty — nothing in the panel correlates strongly with what the models were asked to predict.</figcaption>
+          </figure>
+          <p>The strongest same-year correlation with growth across 1991–2025 is <strong>−0.24</strong> (trade balance). Lagging these variables, as honest forecasting requires, weakens them further. There was never much signal to extract.</p>
           </div>
 
           <div class="callout callout-key">
@@ -223,6 +249,50 @@
             <p>The exploratory analysis reached this conclusion <em>before</em> any model was fitted — the stationarity test and autocorrelation check are in section 10 of the EDA notebook. The modelling step confirmed a prediction the data had already made.</p>
             <p>Reporting a machine learning model as the winner here would have required either dropping the baseline from the comparison or using unlagged features. Both are common, both produce a better-looking scoreboard, and both are misleading.</p>
           </div>
+        </section>
+
+
+        <section class="cs-section" id="sql">
+          <h2>The SQL layer</h2>
+          <p class="sub">8 analysis queries over a SQLite build of the panel</p>
+          <p>The cleaned panel is loaded into SQLite as <code class="inline">indicators(year, indicator, value)</code> with a companion <code class="inline">indicator_meta</code> table. The queries are standard SQL and run unchanged on PostgreSQL and MySQL 8+.</p>
+          <p>Decade volatility is the one worth showing, because SQLite has no <code class="inline">STDDEV</code> — so it is computed from the definition, and the same expression is reused to derive growth per unit of risk:</p>
+          <div class="cs-code"><pre><span class="c">-- Q2. Growth volatility by decade
+-- Average growth alone hides risk. SQLite has no STDDEV, so it is computed
+-- from the definition: sqrt(E[x^2] - E[x]^2).</span>
+<span class="k">SELECT</span>
+    (year / <span class="s">10</span>) * <span class="s">10</span>                                              <span class="k">AS</span> decade,
+    <span class="k">ROUND</span>(<span class="k">AVG</span>(value), <span class="s">2</span>)                                          <span class="k">AS</span> avg_growth_pct,
+    <span class="k">ROUND</span>(<span class="k">SQRT</span>(<span class="k">AVG</span>(value * value) - <span class="k">AVG</span>(value) * <span class="k">AVG</span>(value)), <span class="s">2</span>)  <span class="k">AS</span> volatility,
+    <span class="k">ROUND</span>(
+        <span class="k">AVG</span>(value) / <span class="k">NULLIF</span>(<span class="k">SQRT</span>(<span class="k">AVG</span>(value * value) - <span class="k">AVG</span>(value) * <span class="k">AVG</span>(value)), <span class="s">0</span>),
+        <span class="s">2</span>
+    )                                                             <span class="k">AS</span> growth_per_unit_risk
+<span class="k">FROM</span> indicators
+<span class="k">WHERE</span> indicator = <span class="s">'gdp_growth_pct'</span>
+<span class="k">GROUP BY</span> decade
+<span class="k">ORDER BY</span> decade;</pre></div>
+          <p>That query is what produces the 1970s figure of 0.74 against the 2010s' 4.74 quoted in finding 1.</p>
+          <p>Isolating the years where growth itself moved sharply uses <code class="inline">LAG</code>, ordered by the absolute size of the move rather than by year:</p>
+          <div class="cs-code"><pre><span class="c">-- Q3. Year-on-year change in growth, using a window function
+-- Isolates the years where the growth rate itself moved sharply.</span>
+<span class="k">WITH</span> growth <span class="k">AS</span> (
+    <span class="k">SELECT</span>
+        year,
+        value                                        <span class="k">AS</span> growth_pct,
+        <span class="k">LAG</span>(value) <span class="k">OVER</span> (<span class="k">ORDER BY</span> year)              <span class="k">AS</span> prev_growth_pct
+    <span class="k">FROM</span> indicators
+    <span class="k">WHERE</span> indicator = <span class="s">'gdp_growth_pct'</span>
+)
+<span class="k">SELECT</span>
+    year,
+    <span class="k">ROUND</span>(growth_pct, <span class="s">2</span>)                             <span class="k">AS</span> growth_pct,
+    <span class="k">ROUND</span>(growth_pct - prev_growth_pct, <span class="s">2</span>)           <span class="k">AS</span> change_vs_prev_year
+<span class="k">FROM</span> growth
+<span class="k">WHERE</span> prev_growth_pct <span class="k">IS NOT NULL</span>
+<span class="k">ORDER BY</span> <span class="k">ABS</span>(growth_pct - prev_growth_pct) <span class="k">DESC</span>
+<span class="k">LIMIT</span> <span class="s">10</span>;</pre></div>
+          <p>The shocks it surfaces — 1965, 1979, 2020 — are the same ones that make the naive carry-forward baseline the worst performer in the scoreboard, since none of them persist into the following year.</p>
         </section>
 
         <section class="cs-section" id="recommend">

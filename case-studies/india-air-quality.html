@@ -66,6 +66,7 @@
         <a href="#findings">Findings</a>
         <a href="#stubble">The stubble trap</a>
         <a href="#diwali">Diwali</a>
+        <a href="#sql">The SQL</a>
         <a href="#recommend">Recommendations</a>
         <a href="#limits">Limitations</a>
       </div>
@@ -119,7 +120,12 @@
 
           <div class="finding">
             <h3><span class="n">1</span> The gap between cities is enormous</h3>
-            <div class="cs-table">
+            
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-air-quality/01_city_ranking.png" alt="Mean AQI by Indian city, ranked" loading="lazy">
+            <figcaption><strong>City ranking by mean AQI.</strong> The four worst all sit on the Indo-Gangetic Plain.</figcaption>
+          </figure>
+          <div class="cs-table">
               <table>
                 <thead><tr><th>City</th><th>Zone</th><th class="num">Mean AQI</th><th class="num">Worst</th><th class="num">Safe days</th></tr></thead>
                 <tbody>
@@ -144,7 +150,12 @@
 
           <div class="finding">
             <h3><span class="n">2</span> Geography beats everything else</h3>
-            <div class="cs-table">
+            
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-air-quality/03_seasonal_profile.png" alt="Seasonal AQI profile by geographic zone" loading="lazy">
+            <figcaption><strong>Seasonal profile by zone.</strong> The plain sits above every other zone in every month — the gap is structural, not seasonal.</figcaption>
+          </figure>
+          <div class="cs-table">
               <table>
                 <thead><tr><th>Zone</th><th class="num">Mean</th><th class="num">Median</th><th class="num">Max</th></tr></thead>
                 <tbody>
@@ -160,7 +171,12 @@
 
           <div class="finding">
             <h3><span class="n">3</span> Summer is worse than post-monsoon</h3>
-            <div class="cs-table">
+            
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-air-quality/02_seasonal_heatmap.png" alt="Heatmap of AQI by city and month" loading="lazy">
+            <figcaption><strong>City × month heatmap.</strong> The monsoon trough is visible as a band across every city; the summer ridge is the part the public conversation misses.</figcaption>
+          </figure>
+          <div class="cs-table">
               <table>
                 <thead><tr><th>Season</th><th class="num">Mean AQI</th></tr></thead>
                 <tbody>
@@ -178,7 +194,12 @@
           <div class="finding">
             <h3><span class="n">4</span> The AQI-determining pollutant rotates through the year</h3>
             <p>This is the finding that reframes everything above. Share of city-days on which each pollutant <em>sets</em> the AQI, by month:</p>
-            <div class="cs-table">
+            
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-air-quality/07_pollutant_seasonality.png" alt="Share of days each pollutant sets the AQI, by month" loading="lazy">
+            <figcaption><strong>The rotation.</strong> PM2.5 owns November to January and all but disappears by April, when ozone and dust take over.</figcaption>
+          </figure>
+          <div class="cs-table">
               <table>
                 <thead><tr><th>Month</th><th class="num">PM2.5</th><th class="num">PM10</th><th class="num">O₃</th><th class="num">Other</th></tr></thead>
                 <tbody>
@@ -211,7 +232,12 @@
           <div class="finding">
             <h3><span class="n">5</span> The PM2.5 problem is regional; the ozone problem is national</h3>
             <p>Share of days on which each pollutant is the AQI-determining one, by city:</p>
-            <div class="cs-table">
+            
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-air-quality/06_dominant_pollutant.png" alt="Dominant AQI pollutant by city" loading="lazy">
+            <figcaption><strong>Dominant pollutant by city.</strong> The PM2.5 band is confined to the plain; everywhere else the index is set by something particulate control would not touch.</figcaption>
+          </figure>
+          <div class="cs-table">
               <table>
                 <thead><tr><th>City</th><th class="num">PM2.5</th><th class="num">PM10</th><th class="num">O₃</th></tr></thead>
                 <tbody>
@@ -230,7 +256,12 @@
                 </tbody>
               </table>
             </div>
-            <p>The split is sharp and follows the same geography as finding 2. PM2.5 sets the index on a meaningful share of days <strong>only in the Indo-Gangetic Plain</strong>. In the south and on the Deccan it is effectively never the binding pollutant.</p>
+            
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-air-quality/05_category_distribution.png" alt="Distribution of days across CPCB AQI categories by city" loading="lazy">
+            <figcaption><strong>Days in each CPCB band.</strong> Delhi records zero Good days and 87 Severe ones; six of the twelve cities never reach Severe at all.</figcaption>
+          </figure>
+          <p>The split is sharp and follows the same geography as finding 2. PM2.5 sets the index on a meaningful share of days <strong>only in the Indo-Gangetic Plain</strong>. In the south and on the Deccan it is effectively never the binding pollutant.</p>
             <div class="callout callout-key">
               <span class="callout-title">Why this is the policy finding</span>
               <p>An intervention aimed at the wrong pollutant cannot move the index. <strong>Bengaluru could eliminate its particulate emissions entirely and its AQI would barely change</strong>, because PM2.5 was setting the index on none of its days. Delhi is the only city in this sample where particulate control would move the index on more than a fifth of days.</p>
@@ -280,9 +311,74 @@
               <caption>Diwali window is day −1 to +2; the pre-Diwali baseline is two to four weeks earlier. 69% of city-year pairs show an increase.</caption>
             </table>
           </div>
+          
+          <figure class="cs-figure">
+            <img src="../images/case-studies/india-air-quality/04_diwali_effect.png" alt="Diwali window AQI against each city pre-Diwali baseline" loading="lazy">
+            <figcaption><strong>Diwali effect by city-year.</strong> 69% of pairs rise, but the spread is wide — and the window sits inside a period that was worsening anyway.</figcaption>
+          </figure>
           <p>The own-baseline design gives the <strong>larger</strong> estimate, which is the opposite of what one might expect. The reason is that the annual mean already contains the November-to-January winter peak, so it is a high bar to clear. The two-to-four-weeks-before window falls in the cleaner October shoulder period, so the jump measured against it is bigger.</p>
           <p><strong>Which number is right?</strong> The own-baseline design is the better one — it controls for city-specific and year-specific levels and compares against a period days away rather than months. But it does <em>not</em> control for the seasonal deterioration already under way through October and November. The +21.5 figure therefore contains both the firework effect and several weeks of ordinary seasonal worsening, and should be read as an <strong>upper bound</strong> rather than a clean estimate.</p>
           <p>Isolating the firework contribution properly needs a same-day-of-season control — comparing against the equivalent calendar window in years when Diwali fell elsewhere. With four Diwali dates in the data, that design is not yet powered.</p>
+        </section>
+
+
+        <section class="cs-section" id="sql">
+          <h2>The SQL layer</h2>
+          <p class="sub">8 queries over a SQLite build of the daily city panel</p>
+          <p>The rotation in finding 4 is a conditional-aggregation query — counting, per month, the share of city-days on which each pollutant came out highest:</p>
+          <div class="cs-code"><pre><span class="c">-- Q4. Which pollutant sets the index, by month
+-- Shows the seasonal rotation between particulates and ozone.</span>
+<span class="k">SELECT</span>
+    month,
+    month_name,
+    <span class="k">ROUND</span>(<span class="s">100.0</span> * <span class="k">SUM</span>(<span class="k">CASE WHEN</span> dominant_pollutant = <span class="s">'PM2.5'</span> <span class="k">THEN</span> <span class="s">1</span> <span class="k">ELSE</span> <span class="s">0</span> <span class="k">END</span>)
+          / <span class="k">COUNT</span>(*), <span class="s">1</span>) <span class="k">AS</span> pct_pm25,
+    <span class="k">ROUND</span>(<span class="s">100.0</span> * <span class="k">SUM</span>(<span class="k">CASE WHEN</span> dominant_pollutant = <span class="s">'PM10'</span>  <span class="k">THEN</span> <span class="s">1</span> <span class="k">ELSE</span> <span class="s">0</span> <span class="k">END</span>)
+          / <span class="k">COUNT</span>(*), <span class="s">1</span>) <span class="k">AS</span> pct_pm10,
+    <span class="k">ROUND</span>(<span class="s">100.0</span> * <span class="k">SUM</span>(<span class="k">CASE WHEN</span> dominant_pollutant = <span class="s">'O3'</span>    <span class="k">THEN</span> <span class="s">1</span> <span class="k">ELSE</span> <span class="s">0</span> <span class="k">END</span>)
+          / <span class="k">COUNT</span>(*), <span class="s">1</span>) <span class="k">AS</span> pct_ozone
+<span class="k">FROM</span> daily_aqi
+<span class="k">WHERE</span> dominant_pollutant <span class="k">IS NOT NULL</span>
+<span class="k">GROUP BY</span> month, month_name
+<span class="k">ORDER BY</span> month;</pre></div>
+          <p>The Diwali comparison is the query where the design decision lives. Both windows are built in the same <code class="inline">CASE</code> pass so each city-year is measured against <em>its own</em> baseline rather than against a pooled average:</p>
+          <div class="cs-code"><pre><span class="c">-- Q6. Diwali window against each city's own pre-Diwali baseline
+-- A naive comparison against the annual mean would overstate the effect,
+-- because Diwali sits inside a period when air quality is already worsening.</span>
+<span class="k">WITH</span> windows <span class="k">AS</span> (
+    <span class="k">SELECT</span>
+        city,
+        year,
+        <span class="k">AVG</span>(<span class="k">CASE WHEN</span> days_from_diwali <span class="k">BETWEEN</span> -<span class="s">1</span> <span class="k">AND</span> <span class="s">2</span>  <span class="k">THEN</span> aqi <span class="k">END</span>) <span class="k">AS</span> diwali_aqi,
+        <span class="k">AVG</span>(<span class="k">CASE WHEN</span> days_from_diwali <span class="k">BETWEEN</span> -<span class="s">28</span> <span class="k">AND</span> -<span class="s">14</span> <span class="k">THEN</span> aqi <span class="k">END</span>) <span class="k">AS</span> baseline_aqi
+    <span class="k">FROM</span> daily_aqi
+    <span class="k">WHERE</span> aqi <span class="k">IS NOT NULL</span>
+    <span class="k">GROUP BY</span> city, year
+)
+<span class="k">SELECT</span>
+    city,
+    year,
+    <span class="k">ROUND</span>(diwali_aqi, <span class="s">1</span>)                  <span class="k">AS</span> diwali_window_aqi,
+    <span class="k">ROUND</span>(baseline_aqi, <span class="s">1</span>)                <span class="k">AS</span> baseline_aqi,
+    <span class="k">ROUND</span>(diwali_aqi - baseline_aqi, <span class="s">1</span>)   <span class="k">AS</span> difference
+<span class="k">FROM</span> windows
+<span class="k">WHERE</span> diwali_aqi <span class="k">IS NOT NULL AND</span> baseline_aqi <span class="k">IS NOT NULL</span>
+<span class="k">ORDER BY</span> difference <span class="k">DESC</span>;</pre></div>
+          <p>The comment above the query is doing real work: it records <em>why</em> the baseline window was chosen, so the +21.5 figure is not later mistaken for a clean firework estimate.</p>
+          <p>Delhi's trend line uses an explicit window frame rather than a self-join:</p>
+          <div class="cs-code"><pre><span class="c">-- Q5. 30-day rolling average AQI for Delhi</span>
+<span class="k">SELECT</span>
+    date,
+    aqi,
+    <span class="k">ROUND</span>(
+        <span class="k">AVG</span>(aqi) <span class="k">OVER</span> (
+            <span class="k">ORDER BY</span> date
+            <span class="k">ROWS BETWEEN</span> <span class="s">29</span> <span class="k">PRECEDING AND CURRENT ROW</span>
+        ), <span class="s">1</span>
+    ) <span class="k">AS</span> rolling_30d_aqi
+<span class="k">FROM</span> daily_aqi
+<span class="k">WHERE</span> city = <span class="s">'Delhi'</span> <span class="k">AND</span> aqi <span class="k">IS NOT NULL</span>
+<span class="k">ORDER BY</span> date;</pre></div>
         </section>
 
         <section class="cs-section" id="recommend">

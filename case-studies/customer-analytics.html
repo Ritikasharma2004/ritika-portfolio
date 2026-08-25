@@ -66,6 +66,7 @@
         <a href="#quality">Data quality</a>
         <a href="#findings">Findings</a>
         <a href="#supported">What holds up</a>
+        <a href="#sql">The SQL</a>
         <a href="#recommend">Recommendations</a>
         <a href="#limits">Limitations</a>
       </div>
@@ -135,6 +136,10 @@
           <div class="finding">
             <h3><span class="n">2</span> Subscription is perfectly confounded with gender</h3>
             <p>This one determines how the headline business question can be answered.</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/customer-analytics/01_confound.png" alt="Stacked bars showing zero female customers hold a subscription or received a discount" loading="lazy">
+              <figcaption><strong>Subscription and discount by gender.</strong> The female bar has no coloured segment in either panel — every subscriber and every discount recipient in the file is male.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Gender</th><th class="num">Subscribers</th><th class="num">Non-subscribers</th><th class="num">Received a discount</th></tr></thead>
@@ -201,7 +206,12 @@
           <div class="finding">
             <h3><span class="n">5</span> Purchase amount carries no measurable signal</h3>
             <p>With the subscription split showing nothing, the natural next check is whether the spend column relates to any other field in the extract. On every test run here, it does not.</p>
-            <p>Purchase amount takes 81 distinct integer values spanning exactly $20 to $100, and the frequencies across those 81 values are consistent with a uniform draw — <strong>chi-square goodness of fit p = 0.56</strong>. Correlations with every plausible driver are effectively zero:</p>
+            <p>Purchase amount takes 81 distinct integer values spanning exactly $20 to $100, and the frequencies across those 81 values are consistent with a uniform draw — <strong>chi-square goodness of fit p = 0.56</strong>.</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/customer-analytics/02_uniform_spend.png" alt="Histogram of purchase amounts sitting flat against the uniform expectation line" loading="lazy">
+              <figcaption><strong>Purchase amount distribution.</strong> Flat between two round bounds, with the bars scattering around the uniform expectation rather than forming any peak or skew.</figcaption>
+            </figure>
+            <p>Correlations with every plausible driver are effectively zero:</p>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Variable</th><th class="num">Pearson r</th><th class="num">p</th></tr></thead>
@@ -212,6 +222,10 @@
                 </tbody>
               </table>
             </div>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/customer-analytics/03_no_signal.png" alt="Mean spend with confidence intervals by subscription, category and season, all overlapping the overall mean" loading="lazy">
+              <figcaption><strong>Mean spend with 95% intervals.</strong> Three different ways of cutting the data, and every interval crosses the overall mean (dotted line). There is no grouping in this extract that separates on spend.</figcaption>
+            </figure>
             <p>Group comparisons agree. One-way ANOVA on purchase amount across <strong>category p = 0.225</strong>, across <strong>all 50 locations p = 0.097</strong>. Only season crosses the 0.05 line, at <strong>p = 0.011</strong> — and with this many tests run across the dataset, roughly one nominal pass at 0.05 is what pure noise produces. It is reported here rather than promoted to a finding.</p>
             <div class="callout callout-note">
               <span class="callout-title">Method note</span>
@@ -245,6 +259,50 @@
             </table>
           </div>
           <p>Clothing accounts for 44.5% of all transactions and Outerwear 8.3% — a genuine catalogue-mix fact a merchandising team could act on. What cannot be said is that any of these groups <em>spends</em> differently, because spend carries no signal.</p>
+        </section>
+
+        <section class="cs-section" id="sql">
+          <h2>The SQL layer</h2>
+          <p class="sub">PostgreSQL — aggregation, subqueries, CASE segmentation and window functions</p>
+          <p>The subscription question is the one the whole analysis turns on, and its query is straightforward. What the query cannot show on its own is that the two groups differ by gender as well as by subscription:</p>
+          <div class="cs-code"><pre><span class="c">-- Q5 Do subscribed customers spend more? Compare average spend and total
+-- revenue between subscribers and non-subscribers.</span>
+<span class="k">select</span> subscription_status,
+       <span class="k">count</span>(customer_id)                <span class="k">as</span> total_customers,
+       <span class="k">round</span>(<span class="k">avg</span>(purchase_amount), <span class="s">2</span>)   <span class="k">as</span> avg_spend,
+       <span class="k">round</span>(<span class="k">sum</span>(purchase_amount), <span class="s">2</span>)   <span class="k">as</span> total_revenue
+<span class="k">from</span> customer
+<span class="k">group by</span> subscription_status
+<span class="k">order by</span> total_revenue, avg_spend <span class="k">desc</span>;</pre></div>
+          <p>This returns $59.49 against $59.87 — a $0.38 gap that looks like a small negative result. The profiling work is what reveals that the comparison is also splitting on gender, which is why the reported figure in finding 4 is the within-men version instead.</p>
+          <p>Customer segmentation uses a <code class="inline">CASE</code> ladder inside a CTE, keeping the banding logic in one place rather than repeating it across queries:</p>
+          <div class="cs-code"><pre><span class="c">-- Q7 Segment customers into new, returning and loyal based on their total
+-- number of previous purchases, and show the count of each segment.</span>
+<span class="k">with</span> customer_type <span class="k">as</span> (
+    <span class="k">select</span> customer_id, previous_purchases,
+           <span class="k">case</span>
+               <span class="k">when</span> previous_purchases = <span class="s">1</span> <span class="k">then</span> <span class="s">'New'</span>
+               <span class="k">when</span> previous_purchases <span class="k">between</span> <span class="s">2</span> <span class="k">and</span> <span class="s">10</span> <span class="k">then</span> <span class="s">'Returning'</span>
+               <span class="k">else</span> <span class="s">'Loyal'</span>
+           <span class="k">end</span> <span class="k">as</span> customer_segment
+    <span class="k">from</span> customer
+)
+<span class="k">select</span> customer_segment, <span class="k">count</span>(*) <span class="k">as</span> <span class="s">"number of customers"</span>
+<span class="k">from</span> customer_type
+<span class="k">group by</span> customer_segment;</pre></div>
+          <p>And the top products per category use <code class="inline">ROW_NUMBER</code> partitioned by category — a ranking within groups rather than an overall one:</p>
+          <div class="cs-code"><pre><span class="c">-- Q8 What are the top 3 most purchased products within each category?</span>
+<span class="k">with</span> item_counts <span class="k">as</span> (
+    <span class="k">select</span> category,
+           item_purchased,
+           <span class="k">count</span>(customer_id) <span class="k">as</span> total_orders,
+           <span class="k">row_number</span>() <span class="k">over</span> (<span class="k">partition by</span> category
+                              <span class="k">order by</span> <span class="k">count</span>(customer_id) <span class="k">desc</span>) <span class="k">as</span> item_rank
+    <span class="k">from</span> customer
+    <span class="k">group by</span> category, item_purchased
+)
+<span class="k">select</span> * <span class="k">from</span> item_counts <span class="k">where</span> item_rank &lt;= <span class="s">3</span>;</pre></div>
+          <p>Counting queries like this one are unaffected by everything in the findings above — order counts are recorded facts. It is only the queries that average <code class="inline">purchase_amount</code> that need the caveats attached.</p>
         </section>
 
         <section class="cs-section" id="recommend">

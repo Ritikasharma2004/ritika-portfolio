@@ -65,6 +65,7 @@
         <a href="#quality">Data quality</a>
         <a href="#findings">Findings</a>
         <a href="#stations">Which stations</a>
+        <a href="#sql">The SQL</a>
         <a href="#recommend">Recommendations</a>
         <a href="#limits">Limitations</a>
       </div>
@@ -149,6 +150,10 @@
           <div class="finding">
             <h3><span class="n">4</span> The number I expected to use is useless</h3>
             <p>The obvious first measurement is each station's net flow over a day: bikes arriving minus bikes leaving. If a station keeps losing bikes, send a van.</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/chicago-bike-rebalancing/01_daily_drift.png" alt="Distribution of whole-day net bike flow across Divvy station-days, centred on zero" loading="lazy">
+              <figcaption><strong>Whole-day net flow across 25,657 station-days.</strong> A tight spike on zero. This is the metric the project set out to use, and there is nothing in it.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Whole-day net flow, across 25,657 station-days</th><th class="num">Value</th></tr></thead>
@@ -165,6 +170,10 @@
           <div class="finding">
             <h3><span class="n">5</span> The movement is all inside the day</h3>
             <p>Splitting the day into five windows and measuring net flow in each one tells a completely different story:</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/chicago-bike-rebalancing/02_churn_vs_drift.png" alt="Within-day bike churn compared against whole-day drift for Divvy stations" loading="lazy">
+              <figcaption><strong>Churn against drift.</strong> The same stations, measured two ways. Within-day movement dwarfs the daily net figure by a factor of 6.3.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Measure</th><th class="num">Bikes, average station</th></tr></thead>
@@ -193,11 +202,23 @@
           <div class="finding">
             <h3><span class="n">6</span> Morning and evening are the same trip, reversed</h3>
             <p>Across the 366 busiest stations, morning net flow and evening net flow correlate at <strong>−0.87</strong>.</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/chicago-bike-rebalancing/03_am_pm_reversal.png" alt="Scatter of morning against evening net bike flow showing a strong negative relationship" loading="lazy">
+              <figcaption><strong>Morning against evening net flow.</strong> Stations fall along a clean downward diagonal — whatever a station loses in the morning, it takes back in the evening.</figcaption>
+            </figure>
             <p>A correlation that strong and that negative means the two peaks are one movement seen twice: the bikes that leave a residential street at eight in the morning are the same bikes coming back at six. <strong>Nothing needs trucking overnight, because the riders do the rebalancing themselves on the way home.</strong></p>
             <div class="callout callout-note">
               <span class="callout-title">The commute reading is testable, and it passes</span>
               <p>On weekdays trips peak at 17:00 with a second bump at 08:00; at weekends the morning peak simply is not there. Members take <strong>19.7%</strong> of their weekday trips in the 7–9am window against <strong>11.4%</strong> for casual riders, and casual trips run <strong>1.5× longer</strong> at the median. One group is going to work; the other is going for a ride.</p>
             </div>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/chicago-bike-rebalancing/05_weekday_weekend.png" alt="Hourly Divvy trip volume on weekdays compared against weekends" loading="lazy">
+              <figcaption><strong>Weekday against weekend, by hour.</strong> The 8am spike exists only on weekdays. That absence is what confirms the commute reading rather than merely fitting it.</figcaption>
+            </figure>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/chicago-bike-rebalancing/06_riders_and_seasons.png" alt="Divvy rider type and trip duration split across seasons" loading="lazy">
+              <figcaption><strong>Rider type and season.</strong> Members and casual riders use the system differently, and winter changes the mix as well as the volume.</figcaption>
+            </figure>
           </div>
 
           <div class="finding">
@@ -220,6 +241,10 @@
           <h2>So which stations actually need a van</h2>
           <p class="sub">Measured against the station's own docks, not against raw volume</p>
           <p>The right measurement is the morning swing <strong>as a share of the station's own dock capacity</strong>. Four bikes is nothing at a fifty-dock station and is most of a seven-dock one. Over 66 weekdays:</p>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/chicago-bike-rebalancing/04_morning_map.png" alt="Map of Chicago Divvy stations coloured by morning net bike flow as a share of dock capacity" loading="lazy">
+            <figcaption><strong>Morning swing as a share of capacity, mapped.</strong> The draining stations form a residential ring; the filling ones cluster in the Loop. The geography is the commute.</figcaption>
+          </figure>
 
           <h3>Empties every morning — van should arrive before 7am</h3>
           <div class="cs-table">
@@ -256,6 +281,68 @@
             <p><strong>Sedgwick St &amp; Webster Ave</strong> is the clearest case: it loses 3.9 bikes on an average weekday morning from only <strong>7 docks</strong>, so more than half the station empties before nine. Ranked on raw bikes lost it would not appear anywhere near the top of the list, because a small station <em>cannot</em> lose many bikes in absolute terms.</p>
             <p>The fills are the mirror image and are just as much of a problem, for the opposite reason: a rider arriving downtown at half past eight finds no free dock and has to keep riding.</p>
           </div>
+        </section>
+
+        <section class="cs-section" id="sql">
+          <h2>The SQL layer</h2>
+          <p class="sub">8 queries over a SQLite build of the trip table</p>
+          <p>A trip touches two stations, so every station-level measure starts by unpivoting each trip into a departure row and an arrival row with <code class="inline">UNION ALL</code>. This is the query for the metric that turned out to be empty — and it is kept in the repository precisely because the null result is the finding:</p>
+          <div class="cs-code"><pre><span class="c">-- Q2. Whole-day net flow per station
+-- The measurement I expected to build the answer on. Bikes in minus bikes out,
+-- per station per day. The point of the query is that the answer is ~0.</span>
+<span class="k">WITH</span> daily <span class="k">AS</span> (
+    <span class="k">SELECT</span>
+        station,
+        start_date,
+        <span class="k">SUM</span>(arrived) <span class="k">AS</span> arrivals,
+        <span class="k">SUM</span>(departed) <span class="k">AS</span> departures
+    <span class="k">FROM</span> (
+        <span class="k">SELECT</span> start_station_name <span class="k">AS</span> station, start_date, <span class="s">0</span> <span class="k">AS</span> arrived, <span class="s">1</span> <span class="k">AS</span> departed
+        <span class="k">FROM</span> trips <span class="k">WHERE</span> dock_to_dock = <span class="s">1</span> <span class="k">AND</span> usable = <span class="s">1</span>
+        <span class="k">UNION ALL</span>
+        <span class="k">SELECT</span> end_station_name <span class="k">AS</span> station, start_date, <span class="s">1</span> <span class="k">AS</span> arrived, <span class="s">0</span> <span class="k">AS</span> departed
+        <span class="k">FROM</span> trips <span class="k">WHERE</span> dock_to_dock = <span class="s">1</span> <span class="k">AND</span> usable = <span class="s">1</span>
+    )
+    <span class="k">GROUP BY</span> station, start_date
+)
+<span class="k">SELECT</span>
+    <span class="k">COUNT</span>(*)                                                <span class="k">AS</span> station_days,
+    <span class="k">ROUND</span>(<span class="k">AVG</span>(arrivals - departures), <span class="s">3</span>)                    <span class="k">AS</span> mean_net,
+    <span class="k">ROUND</span>(<span class="k">AVG</span>(<span class="k">ABS</span>(arrivals - departures)), <span class="s">2</span>)               <span class="k">AS</span> mean_abs_net,
+    <span class="k">ROUND</span>(<span class="k">AVG</span>(arrivals + departures), <span class="s">1</span>)                    <span class="k">AS</span> mean_turnover,
+    <span class="k">ROUND</span>(<span class="s">100.0</span> * <span class="k">SUM</span>(<span class="k">CASE WHEN</span> <span class="k">ABS</span>(arrivals - departures)
+                           &lt;= <span class="s">0.10</span> * (arrivals + departures)
+                      <span class="k">THEN</span> <span class="s">1</span> <span class="k">ELSE</span> <span class="s">0</span> <span class="k">END</span>) / <span class="k">COUNT</span>(*), <span class="s">1</span>)     <span class="k">AS</span> pct_within_10pct
+<span class="k">FROM</span> daily;</pre></div>
+          <p>Reporting <code class="inline">mean_net</code> and <code class="inline">mean_abs_net</code> side by side is what makes the emptiness legible: the signed mean is −0.02 while the absolute mean is not small, so the movement exists and simply cancels.</p>
+          <p>The operational query adds the hour and weekday filters and divides through by dock capacity — which is the step that changes the ranking entirely:</p>
+          <div class="cs-code"><pre><span class="c">-- Q4. The stations that empty every weekday morning, ranked by capacity
+-- Ranked on share of docks rather than raw bikes, because a seven-dock station
+-- cannot lose many bikes in absolute terms and would never surface in a
+-- volume ranking.</span>
+<span class="k">WITH</span> morning <span class="k">AS</span> (
+    <span class="k">SELECT</span>
+        station,
+        <span class="k">SUM</span>(arrived) - <span class="k">SUM</span>(departed)                        <span class="k">AS</span> net,
+        <span class="k">SUM</span>(arrived) + <span class="k">SUM</span>(departed)                        <span class="k">AS</span> turnover
+    <span class="k">FROM</span> (
+        <span class="k">SELECT</span> start_station_name <span class="k">AS</span> station, <span class="s">0</span> <span class="k">AS</span> arrived, <span class="s">1</span> <span class="k">AS</span> departed
+        <span class="k">FROM</span> trips
+        <span class="k">WHERE</span> dock_to_dock = <span class="s">1</span> <span class="k">AND</span> usable = <span class="s">1</span>
+          <span class="k">AND</span> is_weekend = <span class="s">0</span> <span class="k">AND</span> start_hour <span class="k">BETWEEN</span> <span class="s">7</span> <span class="k">AND</span> <span class="s">9</span>
+        <span class="k">UNION ALL</span>
+        <span class="k">SELECT</span> end_station_name <span class="k">AS</span> station, <span class="s">1</span> <span class="k">AS</span> arrived, <span class="s">0</span> <span class="k">AS</span> departed
+        <span class="k">FROM</span> trips
+        <span class="k">WHERE</span> dock_to_dock = <span class="s">1</span> <span class="k">AND</span> usable = <span class="s">1</span>
+          <span class="k">AND</span> is_weekend = <span class="s">0</span> <span class="k">AND</span> start_hour <span class="k">BETWEEN</span> <span class="s">7</span> <span class="k">AND</span> <span class="s">9</span>
+    )
+    <span class="k">GROUP BY</span> station
+),
+weekdays <span class="k">AS</span> (
+    <span class="k">SELECT</span> <span class="k">COUNT</span>(<span class="k">DISTINCT</span> start_date) <span class="k">AS</span> n <span class="k">FROM</span> trips <span class="k">WHERE</span> is_weekend = <span class="s">0</span>
+)
+<span class="k">SELECT</span> m.station, ... <span class="c">-- net per weekday, docks, and net as a share of capacity</span></pre></div>
+          <p>The <code class="inline">usable = 1</code> predicate is doing quiet work throughout: failed dockings and sub-minute trips are flagged rather than deleted, so they never inflate a station's turnover here while remaining available for the data-quality report.</p>
         </section>
 
         <section class="cs-section" id="recommend">

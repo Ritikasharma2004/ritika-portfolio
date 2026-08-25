@@ -326,6 +326,31 @@
 .cs-table .lo { font-weight: 700; color: #b91c1c; }
 .cs-table tr.total td { font-weight: 700; background: var(--bg-alt); }
 
+/* ---------- Figures ---------- */
+
+.cs-figure {
+  margin: 0 0 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+.cs-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #fff;
+}
+.cs-figure figcaption {
+  padding: 12px 16px;
+  font-size: 0.81rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  border-top: 1px solid var(--border);
+  background: var(--bg-alt);
+}
+.cs-figure figcaption strong { color: var(--text); font-weight: 600; }
+
 /* ---------- Code ---------- */
 
 .cs-code {

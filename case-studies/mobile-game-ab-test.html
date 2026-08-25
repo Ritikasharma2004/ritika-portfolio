@@ -67,6 +67,7 @@
         <a href="#power">Power</a>
         <a href="#bot">The bot</a>
         <a href="#filter">The filter trap</a>
+        <a href="#sql">The SQL</a>
         <a href="#recommend">Recommendations</a>
       </div>
     </div>
@@ -84,6 +85,10 @@
         <section class="cs-section" id="srm">
           <h2>Check the randomisation before reading the metrics</h2>
           <p class="sub">This runs first because it can invalidate everything after it</p>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/mobile-game-ab-test/01_sample_ratio.png" alt="Observed split between the two A/B test arms against the intended fifty-fifty split" loading="lazy">
+            <figcaption><strong>Sample ratio check.</strong> The observed split against the intended 50/50. The gap is small but larger than chance at the 0.05 level.</figcaption>
+          </figure>
           <div class="cs-table">
             <table>
               <thead><tr><th>Variant</th><th class="num">Players</th><th class="num">Share</th></tr></thead>
@@ -120,6 +125,10 @@
 
         <section class="cs-section" id="findings">
           <h2>The result</h2>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/mobile-game-ab-test/02_retention_effects.png" alt="One-day and seven-day retention rates for both A/B test arms with confidence intervals" loading="lazy">
+            <figcaption><strong>Retention by arm, with 95% confidence intervals.</strong> The 7-day interval clears zero; the 1-day interval does not.</figcaption>
+          </figure>
           <div class="cs-table">
             <table>
               <thead><tr><th>Metric</th><th class="num">gate_30</th><th class="num">gate_40</th><th class="num">Difference</th><th class="num">95% CI</th><th class="num">p</th><th>Verdict</th></tr></thead>
@@ -129,6 +138,10 @@
               </tbody>
             </table>
           </div>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/mobile-game-ab-test/04_bootstrap.png" alt="Bootstrap distribution of the retention difference across ten thousand resamples" loading="lazy">
+            <figcaption><strong>Bootstrap, 10,000 resamples.</strong> The 7-day distribution sits almost entirely below zero; the 1-day one straddles it.</figcaption>
+          </figure>
           <p>7-day retention fell <strong>0.82 percentage points</strong>, a 4.3% relative drop. The bootstrap puts it in the terms a product decision actually needs: across <strong>10,000 resamples, gate_40 came out behind on 7-day retention in 99.9% of them</strong>, and behind on 1-day retention in 96.2%.</p>
         </section>
 
@@ -136,6 +149,10 @@
           <h2>The day-1 effect is unmeasured, not absent</h2>
           <p class="sub">The finding that most analyses of this dataset get wrong</p>
           <p>The 1-day row is where most analyses stop, conclude "no effect on day-1 retention", and move on. That conclusion is not supported, and the reason is a number the p-value does not contain.</p>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/mobile-game-ab-test/03_power_and_mde.png" alt="Statistical power curve and minimum detectable effect for both retention metrics" loading="lazy">
+            <figcaption><strong>Power and minimum detectable effect.</strong> The observed day-1 effect sits below the floor this sample size can resolve — which is why its p-value carries no information either way.</figcaption>
+          </figure>
           <div class="callout callout-key">
             <span class="callout-title">Minimum detectable effect</span>
             <p>At 90,189 players split roughly evenly, with a day-1 baseline of 44.82%, the <strong>minimum detectable effect at 80% power is 0.93pp</strong>. The observed effect was <strong>0.59pp — below the detection floor</strong>.</p>
@@ -153,6 +170,10 @@
             <span class="callout-title">userid 6390605</span>
             <p>Recorded with <strong>49,854 rounds in 14 days</strong>. That is 3,561 rounds a day — one every 24 seconds, around the clock, for two weeks — and <strong>17× the next highest player</strong> in the file, who managed 2,961.</p>
           </div>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/mobile-game-ab-test/05_engagement_and_outlier.png" alt="Distribution of rounds played showing a single extreme outlier player" loading="lazy">
+            <figcaption><strong>Rounds played, with and without the outlier.</strong> The distribution is heavily right-skewed and one point sits far outside it — which is why a mean comparison was never safe here.</figcaption>
+          </figure>
           <div class="cs-table">
             <table>
               <thead><tr><th></th><th class="num">gate_30 mean</th><th class="num">gate_40 mean</th><th class="num">Gap</th><th class="num">Median (both)</th></tr></thead>
@@ -171,6 +192,10 @@
           <h2>The tempting filters make the effect bigger and the answer wrong</h2>
           <p>A gate at level 30 cannot affect a player who never reached level 30. So the natural instinct is to drop the players it could not have touched and measure a cleaner effect on the ones it could. Doing that inflates the 7-day effect from <strong>−0.82pp to −1.78pp</strong> — more than double, and a much more publishable-looking number.</p>
           <p>It is also invalid, and the data says so directly:</p>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/mobile-game-ab-test/06_selection_bias.png" alt="Ratio of control to treatment progression rates across increasing round thresholds" loading="lazy">
+            <figcaption><strong>Selection bias, made visible.</strong> The control-to-treatment ratio is not flat: it peaks around 30 rounds and crosses below 1.0 between the two gate levels — exactly where a gate at level 30 would start holding the control arm up.</figcaption>
+          </figure>
           <div class="cs-table">
             <table>
               <thead><tr><th class="num">Reached at least</th><th class="num">gate_30 rate</th><th class="num">gate_40 rate</th><th class="num">Ratio</th></tr></thead>
@@ -195,6 +220,54 @@
           </div>
           <p>The 4.43% who never played once are kept for the same reason. They dilute the estimate toward zero, and they are the price of an unbiased one.</p>
           <p class="sub" style="margin-top:18px">One caveat the column headings hide: <code class="inline">sum_gamerounds</code> counts rounds played, not levels cleared, and a player can replay a level. "Reached 30 rounds" is a proxy for progression, not a literal record of arriving at the gate. That is good enough for the argument being made, which turns on the <em>direction</em> the filter moves rather than its exact calibration.</p>
+        </section>
+
+        <section class="cs-section" id="sql">
+          <h2>The SQL layer</h2>
+          <p class="sub">8 queries over a SQLite build of the player table</p>
+          <p>The engagement comparison is deliberately reported as <em>percentiles rather than means</em>, and the query says why in its own comment. SQLite has no <code class="inline">PERCENTILE_CONT</code>, so they are derived from <code class="inline">ROW_NUMBER</code>:</p>
+          <div class="cs-code"><pre><span class="c">-- Q6. Rounds played: distribution, not means
+-- Percentiles via ROW_NUMBER, because SQLite has no PERCENTILE_CONT. The bot
+-- is excluded here; it moves the mean by more than a full round and the
+-- percentiles not at all, which is the argument for reporting both.</span>
+<span class="k">WITH</span> ranked <span class="k">AS</span> (
+    <span class="k">SELECT</span>
+        version,
+        sum_gamerounds,
+        <span class="k">ROW_NUMBER</span>() <span class="k">OVER</span> (<span class="k">PARTITION BY</span> version <span class="k">ORDER BY</span> sum_gamerounds) <span class="k">AS</span> rn,
+        <span class="k">COUNT</span>(*)    <span class="k">OVER</span> (<span class="k">PARTITION BY</span> version)                          <span class="k">AS</span> n
+    <span class="k">FROM</span> players
+    <span class="k">WHERE</span> implausible_volume = <span class="s">0</span>
+)
+<span class="k">SELECT</span>
+    version,
+    n                                                                <span class="k">AS</span> players,
+    <span class="k">MAX</span>(<span class="k">CASE WHEN</span> rn = <span class="k">CAST</span>(<span class="s">0.25</span> * n <span class="k">AS INTEGER</span>) <span class="k">THEN</span> sum_gamerounds <span class="k">END</span>) <span class="k">AS</span> p25,
+    <span class="k">MAX</span>(<span class="k">CASE WHEN</span> rn = <span class="k">CAST</span>(<span class="s">0.50</span> * n <span class="k">AS INTEGER</span>) <span class="k">THEN</span> sum_gamerounds <span class="k">END</span>) <span class="k">AS</span> median,
+    <span class="k">MAX</span>(<span class="k">CASE WHEN</span> rn = <span class="k">CAST</span>(<span class="s">0.95</span> * n <span class="k">AS INTEGER</span>) <span class="k">THEN</span> sum_gamerounds <span class="k">END</span>) <span class="k">AS</span> p95,
+    <span class="k">MAX</span>(sum_gamerounds)                                              <span class="k">AS</span> max_rounds
+<span class="k">FROM</span> ranked
+<span class="k">GROUP BY</span> version, n;</pre></div>
+          <p>Note <code class="inline">implausible_volume = 0</code> — the bot is a flag on the row, not a deleted row, so the same query answers the question both ways by flipping one predicate.</p>
+          <p>The day-1 / day-7 cross-tabulation exists to confirm the two flags are independent returns rather than a funnel, which is what makes the 3,599 "day 7 but not day 1" players legitimate rather than a data error:</p>
+          <div class="cs-code"><pre><span class="c">-- Q4. Day-1 and day-7 return, cross-tabulated
+-- Confirms the two flags are independent returns rather than a funnel: the
+-- "came back on day 7 but not day 1" cell is populated in both arms.</span>
+<span class="k">SELECT</span>
+    version,
+    <span class="k">CASE</span>
+        <span class="k">WHEN</span> retention_1 = <span class="s">1</span> <span class="k">AND</span> retention_7 = <span class="s">1</span> <span class="k">THEN</span> <span class="s">'both days'</span>
+        <span class="k">WHEN</span> retention_1 = <span class="s">1</span> <span class="k">AND</span> retention_7 = <span class="s">0</span> <span class="k">THEN</span> <span class="s">'day 1 only'</span>
+        <span class="k">WHEN</span> retention_1 = <span class="s">0</span> <span class="k">AND</span> retention_7 = <span class="s">1</span> <span class="k">THEN</span> <span class="s">'day 7 only'</span>
+        <span class="k">ELSE</span> <span class="s">'neither'</span>
+    <span class="k">END</span>                                                 <span class="k">AS</span> return_pattern,
+    <span class="k">COUNT</span>(*)                                            <span class="k">AS</span> players,
+    <span class="k">ROUND</span>(<span class="s">100.0</span> * <span class="k">COUNT</span>(*)
+          / <span class="k">SUM</span>(<span class="k">COUNT</span>(*)) <span class="k">OVER</span> (<span class="k">PARTITION BY</span> version), <span class="s">2</span>) <span class="k">AS</span> pct_of_arm
+<span class="k">FROM</span> players
+<span class="k">GROUP BY</span> version, return_pattern
+<span class="k">ORDER BY</span> version, players <span class="k">DESC</span>;</pre></div>
+          <p>The <code class="inline">SUM(COUNT(*)) OVER (PARTITION BY version)</code> is an aggregate inside a window — it turns each cell into a share of its own arm in one pass, so the two arms stay comparable even though they differ in size.</p>
         </section>
 
         <section class="cs-section" id="recommend">

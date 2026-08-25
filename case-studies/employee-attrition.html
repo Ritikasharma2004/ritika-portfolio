@@ -130,6 +130,10 @@
             <h3><span class="n">1</span> Overtime is the strongest driver, and it holds inside every job level</h3>
             <p>Employees working overtime leave at <strong>30.5%</strong> against <strong>10.4%</strong> for those who do not — a near-threefold gap, chi-square p &lt; 10⁻²⁰.</p>
             <p>A gap that large invites the obvious objection: maybe overtime is just a marker for junior, underpaid roles, and seniority is doing the work. It is not. The effect appears independently <em>at every level of the hierarchy</em>:</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/employee-attrition/01_overtime_by_level.png" alt="Attrition rate with and without overtime at each of the five job levels" loading="lazy">
+              <figcaption><strong>Attrition by overtime, within each job level.</strong> The red bar is higher at every level. Junior staff on overtime reach 52.6% against a 16.1% company baseline.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Job level</th><th class="num">No overtime</th><th class="num">Overtime</th><th class="num">Gap</th></tr></thead>
@@ -152,6 +156,10 @@
           <div class="finding">
             <h3><span class="n">2</span> Satisfaction is a floor, not a dial</h3>
             <p>The dashboard-standard reading of a 1–4 satisfaction scale is that attrition falls steadily as satisfaction rises. For two of the four satisfaction measures, that is simply not what the data shows:</p>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/employee-attrition/02_satisfaction_cliff.png" alt="Attrition rate across the four levels of each satisfaction measure, showing flat bars above level one" loading="lazy">
+              <figcaption><strong>All four satisfaction measures.</strong> In the first two panels, everything above level 1 is flat — the bars for 2, 3 and 4 are the same height. Only Job Involvement declines the way the scale implies.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Measure</th><th class="num">Level 1</th><th class="num">Level 2</th><th class="num">Level 3</th><th class="num">Level 4</th><th>Shape</th></tr></thead>
@@ -173,6 +181,10 @@
 
           <div class="finding">
             <h3><span class="n">3</span> Attrition is front-loaded into the first two years</h3>
+            <figure class="cs-figure">
+              <img src="../images/case-studies/employee-attrition/03_tenure_curve.png" alt="Attrition rate declining sharply across tenure bands from under one year to twenty plus" loading="lazy">
+              <figcaption><strong>Attrition by tenure.</strong> The curve falls steeply through the first three years, bottoms out at 11–20 years, then ticks back up — most plausibly retirement, which this data cannot separate from resignation.</figcaption>
+            </figure>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Years at company</th><th class="num">Employees</th><th class="num">Leavers</th><th class="num">Rate</th></tr></thead>
@@ -243,6 +255,10 @@
             </table>
           </div>
           <p>The obvious explanation is age, so the first check was to add age to a logistic model. The effect barely moved. Adding overtime and income did not move it either. Then one column killed it outright:</p>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/employee-attrition/04_marital_artifact.png" alt="Odds ratio for single collapsing to 1.20 once stock options are controlled, beside the share of each marital group with zero stock options" loading="lazy">
+            <figcaption><strong>Left:</strong> the odds ratio for "Single" holds steady through age, overtime and income, then collapses to 1.20 the moment stock options enter. <strong>Right:</strong> why — every single employee in the file has zero stock options.</figcaption>
+          </figure>
           <div class="cs-table">
             <table>
               <thead><tr><th>Model</th><th class="num">Odds ratio, Single</th><th class="num">p</th></tr></thead>
