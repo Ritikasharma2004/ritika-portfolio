@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>India Economic Indicators — Case Study | Ritika Sharma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Forecasting India's GDP growth from 11 World Bank indicators, 1960–2025. No machine learning model beat a mean baseline — and the EDA predicted that before any model was fitted.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css?v=5">
+  <link rel="stylesheet" href="../css/case-study.css?v=1">
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="wrap">
+      <a href="../index.html" class="logo">Ritika Sharma</a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="index.html">Case Studies</a>
+        <a href="../index.html#contact">Contact</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="wrap">
+        <a href="index.html" class="cs-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          All case studies
+        </a>
+        <span class="eyebrow">Case Study 04</span>
+        <h1>India Economic Indicators &amp; Forecasting</h1>
+        <p class="cs-lede">An end-to-end pipeline pulling 11 World Bank indicators live from the API, 1960–2025, then a walk-forward forecasting study of annual GDP growth. <strong>No machine learning model beat predicting the long-run average</strong> — and the exploratory analysis called that outcome before a single model was fitted.</p>
+        <div class="cs-meta">
+          <span>Aug 2026</span>
+          <span>Python · scikit-learn · SQL · Streamlit</span>
+          <span>683 observations · 11 indicators</span>
+        </div>
+        <div class="cs-hero-actions">
+          <a href="https://github.com/Ritikasharma2004/india-economic-indicators" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub
+          </a>
+          <a href="#forecast" class="btn btn-ghost">Jump to the result</a>
+        </div>
+        <div class="stat-strip">
+          <div><div class="num">0.026</div><div class="label">lag-1 autocorrelation of GDP growth</div></div>
+          <div><div class="num">2.97</div><div class="label">baseline RMSE — the best score in the study</div></div>
+          <div><div class="num">+1.91pp</div><div class="label">post-1991 growth, at lower volatility</div></div>
+          <div><div class="num">13</div><div class="label">tests, including data-leakage checks</div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="cs-nav">
+      <div class="wrap">
+        <a href="#brief">The brief</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#findings">Structural findings</a>
+        <a href="#forecast">The forecast</a>
+        <a href="#why">Why it failed</a>
+        <a href="#recommend">Recommendations</a>
+        <a href="#limits">Limitations</a>
+      </div>
+    </div>
+
+    <div class="cs-body">
+      <div class="wrap">
+
+        <section class="cs-section" id="brief">
+          <h2>The brief</h2>
+          <p class="sub">What has driven India's growth, and can next year's be forecast?</p>
+          <p>Two questions, one dataset. The first is descriptive: what changed structurally in the Indian economy between 1960 and 2025. The second is predictive: given eleven published macro indicators, can annual GDP growth be forecast one year ahead?</p>
+          <p>The descriptive half produced four findings. The predictive half produced a negative result — and that negative result is the more useful output, because it is accompanied by a specific, measurable reason.</p>
+        </section>
+
+        <section class="cs-section" id="pipeline">
+          <h2>Pipeline</h2>
+          <p class="sub">Live API ingest through to dashboard</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Stage</th><th>Script</th><th>Output</th></tr></thead>
+              <tbody>
+                <tr><td>Ingest</td><td><code class="inline">src/extract.py</code></td><td>Raw JSON per indicator, pulled live from the World Bank API and retained</td></tr>
+                <tr><td>Clean</td><td><code class="inline">src/transform.py</code></td><td>Tidy panel + automated data quality report</td></tr>
+                <tr><td>Explore</td><td><code class="inline">src/eda.py</code></td><td>5 figures + EDA findings</td></tr>
+                <tr><td>Model</td><td><code class="inline">src/forecast.py</code></td><td>Walk-forward scoreboard, 5 models × 2 feature sets</td></tr>
+                <tr><td>SQL</td><td><code class="inline">src/load_db.py</code>, <code class="inline">src/run_sql.py</code></td><td>SQLite database + 8 analysis queries</td></tr>
+                <tr><td>Dashboard</td><td><code class="inline">dashboard/app.py</code></td><td>Interactive Streamlit app</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Raw JSON is kept rather than discarded after parsing, so any number in the report traces back to the exact API response it came from. The suite of <strong>13 tests</strong> includes explicit data-leakage checks confirming every lagged feature is shifted by at least one year — the failure mode that makes a forecasting model look excellent and be worthless.</p>
+        </section>
+
+        <section class="cs-section" id="findings">
+          <h2>Structural findings</h2>
+
+          <div class="finding">
+            <h3><span class="n">1</span> Liberalisation changed the level of growth <em>and</em> its reliability</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Era</th><th class="num">Years</th><th class="num">Mean growth</th><th class="num">Volatility (sd)</th></tr></thead>
+                <tbody>
+                  <tr><td>1961 – 1990</td><td class="num">30</td><td class="num">4.23%</td><td class="num lo">3.36</td></tr>
+                  <tr><td>1991 – 2025</td><td class="num">35</td><td class="num hi">6.14%</td><td class="num hi">2.80</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>Growth after 1991 is <strong>1.91 percentage points higher on average</strong>. The part usually left out is that it is also <em>less volatile</em> — standard deviation falls from 3.36 to 2.80. The pre-liberalisation economy did not merely grow more slowly; it grew less predictably.</p>
+            <p>At decade resolution the contrast is starker. The 1970s averaged 2.93% growth with volatility of 3.94; the 2010s averaged 6.64% with volatility of 1.40. Measured as growth per unit of risk, that is <strong>4.74 against 0.74</strong> — a sixfold improvement in the stability of growth, not just its rate.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">2</span> India moved from agriculture to services, skipping industry</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Decade</th><th class="num">Agriculture</th><th class="num">Industry</th><th class="num">Services</th></tr></thead>
+                <tbody>
+                  <tr><td>1960s</td><td class="num">40.9%</td><td class="num">21.2%</td><td class="num">36.9%</td></tr>
+                  <tr><td>1990s</td><td class="num">25.7%</td><td class="num">27.3%</td><td class="num">38.5%</td></tr>
+                  <tr><td>2020s</td><td class="num">17.6%</td><td class="num">25.5%</td><td class="num hi">48.0%</td></tr>
+                </tbody>
+                <caption>Share of GDP by sector. Industry peaked at 29.2% in the 2000s and has slipped since.</caption>
+              </table>
+            </div>
+            <p>Agriculture's share fell by <strong>23 percentage points</strong> across the period, and almost all of it moved to services. The industry share is essentially flat over 60 years.</p>
+            <div class="callout callout-note">
+              <span class="callout-title">Why this is not just a curiosity</span>
+              <p>This inverts the path most industrialising economies took, where manufacturing absorbs labour leaving agriculture before services expand. It matters because services growth absorbs far fewer low-skilled workers per unit of output than manufacturing does — so the same headline GDP growth translates into materially less employment for the workers actually leaving agriculture.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">3</span> Trade openness tracks higher growth</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Openness (exports + imports, % of GDP)</th><th class="num">Years</th><th class="num">Avg growth</th></tr></thead>
+                <tbody>
+                  <tr><td>Under 30%</td><td class="num">12</td><td class="num">5.39%</td></tr>
+                  <tr><td>30 – 45%</td><td class="num">9</td><td class="num">5.70%</td></tr>
+                  <tr><td>Over 45%</td><td class="num">14</td><td class="num hi">7.06%</td></tr>
+                </tbody>
+                <caption>Post-1991 years only, split into thirds by trade openness.</caption>
+              </table>
+            </div>
+            <p>The most open third grew <strong>1.67 percentage points faster</strong> than the least open third, and the pattern is monotonic.</p>
+            <p>The direction of causation is not established here, and the confound is obvious: openness rises when global demand is strong, and strong global demand lifts Indian growth directly. Part of this gap is common cause rather than effect. The association is worth reporting; a causal claim would need an instrument this dataset does not contain.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">4</span> Inflation shows no clean relationship with growth</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Inflation band</th><th class="num">Years</th><th class="num">Avg growth</th></tr></thead>
+                <tbody>
+                  <tr><td>Low (under 5%)</td><td class="num">22</td><td class="num">5.67%</td></tr>
+                  <tr><td>Moderate (5 – 10%)</td><td class="num">27</td><td class="num lo">4.72%</td></tr>
+                  <tr><td>High (10%+)</td><td class="num">16</td><td class="num">5.59%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>There is no monotonic pattern, and high-inflation years averaged <em>higher</em> growth than moderate-inflation ones. The correlation between the two series across 1991–2025 is <strong>−0.14</strong>, which is negligible.</p>
+            <p>This is a negative result and it is reported as one. The intuition that inflation and growth trade off cleanly does not survive contact with 65 years of Indian annual data.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="forecast">
+          <h2>The forecasting result</h2>
+          <p class="sub">Five models, two feature sets, walk-forward validation</p>
+          <p>Models were validated <strong>walk-forward</strong>: train on every year up to <em>t−1</em>, predict year <em>t</em>, step forward, repeat. Every feature is lagged by at least one year, so no model ever sees information that would not have been available at forecast time.</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Feature set</th><th>Model</th><th class="num">RMSE</th><th class="num">MAE</th></tr></thead>
+              <tbody>
+                <tr class="total"><td>Univariate</td><td><strong>Mean (baseline)</strong></td><td class="num hi">2.97</td><td class="num">2.30</td></tr>
+                <tr><td>Univariate</td><td>Ridge</td><td class="num">3.19</td><td class="num">2.51</td></tr>
+                <tr><td>Univariate</td><td>Random Forest</td><td class="num">3.28</td><td class="num">2.59</td></tr>
+                <tr><td>Univariate</td><td>Gradient Boosting</td><td class="num">3.54</td><td class="num">2.67</td></tr>
+                <tr><td>Univariate</td><td>Naive (baseline)</td><td class="num">3.70</td><td class="num">2.31</td></tr>
+                <tr><td>Multivariate</td><td>Mean (baseline)</td><td class="num">3.91</td><td class="num">2.30</td></tr>
+                <tr><td>Multivariate</td><td>Random Forest</td><td class="num">4.03</td><td class="num">2.59</td></tr>
+                <tr><td>Multivariate</td><td>Ridge</td><td class="num lo">7.42</td><td class="num">5.45</td></tr>
+              </tbody>
+              <caption>Lower is better. The best score in the table belongs to predicting the long-run average every year.</caption>
+            </table>
+          </div>
+          <div class="callout callout-key">
+            <span class="callout-title">The result</span>
+            <p>Predicting "growth will be about 6%" every single year beats every machine learning model tried, on both feature sets. Adding ten macro indicators made forecasts <strong>worse, not better</strong> — every multivariate model is less accurate than its univariate counterpart, and multivariate Ridge at RMSE 7.42 is worse than guessing.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="why">
+          <h2>Why it failed — and why that is the finding</h2>
+          <p>A model losing to a baseline is only interesting if you can say why. Three reasons, all properties of the data rather than of the models:</p>
+
+          <div class="finding">
+            <h3><span class="n">1</span> Growth is stationary white noise around a constant mean</h3>
+            <p>This is the single most important number in the project. An Augmented Dickey-Fuller test rejects non-stationarity decisively (<strong>statistic −7.65, p &lt; 0.0001</strong>), and the <strong>lag-1 autocorrelation is 0.026</strong> — effectively zero.</p>
+            <p>Last year's growth carries almost no information about this year's. That single fact dooms the entire modelling approach: lag features cannot work when there is no serial dependence for them to capture. It also explains the shape of the scoreboard — shocks like 1965, 1979 and 2020 are severe but do not persist, which is exactly why the naive carry-forward forecast is the <em>worst</em> baseline while the mean is the best.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">2</span> The sample is far too small for the models used</h3>
+            <p>The univariate setup has 62 usable years; the multivariate one has 32. Tree ensembles need far more than that to learn stable structure, and Ridge fitting 31 features across 32 observations is fitting noise almost by definition — which is precisely what its RMSE of 7.42 reflects.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">3</span> The predictors are weak before they are even lagged</h3>
+            <p>The strongest same-year correlation with growth across 1991–2025 is <strong>−0.24</strong> (trade balance). Lagging these variables, as honest forecasting requires, weakens them further. There was never much signal to extract.</p>
+          </div>
+
+          <div class="callout callout-key">
+            <span class="callout-title">Why this is a finding rather than a failed experiment</span>
+            <p>The exploratory analysis reached this conclusion <em>before</em> any model was fitted — the stationarity test and autocorrelation check are in section 10 of the EDA notebook. The modelling step confirmed a prediction the data had already made.</p>
+            <p>Reporting a machine learning model as the winner here would have required either dropping the baseline from the comparison or using unlagged features. Both are common, both produce a better-looking scoreboard, and both are misleading.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="recommend">
+          <h2>Recommendations</h2>
+          <div class="takeaway">
+            <h3>What would actually improve the forecast</h3>
+            <ul class="cs-list ordered">
+              <li><strong>Quarterly data instead of annual</strong> would roughly quadruple the sample and give the models something to learn from.</li>
+              <li><strong>Genuine leading indicators</strong> — PMI, index of industrial production, credit growth, monsoon rainfall. These carry signal that annual national accounts, which are themselves a summary of the year being predicted, do not.</li>
+              <li><strong>Until then, use the mean.</strong> For one-year-ahead annual GDP growth from published macro aggregates, the long-run average is the defensible forecast, and it should be the benchmark any future model has to beat.</li>
+              <li><strong>Always report the baseline.</strong> Every scoreboard in this project includes both a mean and a naive baseline. Without them, univariate Ridge at RMSE 3.19 looks like a working model.</li>
+            </ul>
+            <p style="margin-top:16px; font-size:0.93rem; color:var(--text-muted)">Neither of the first two is available from the World Bank API, which is the honest boundary of what this project could do.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="limits">
+          <h2>Limitations</h2>
+          <ul class="cs-list">
+            <li><strong>Annual frequency, small sample.</strong> 65 observations is enough to describe trends and thin for modelling. This is why baselines are reported alongside every model rather than as an afterthought.</li>
+            <li><strong>Definitional breaks.</strong> India rebased its GDP series to 2011–12 prices; long-run comparisons cross that break and are affected by it.</li>
+            <li><strong>Provisional recent years.</strong> The most recent value is an estimate and gets revised in later releases.</li>
+            <li><strong>Association, not causation.</strong> Every relationship reported here is correlational. Nothing in this dataset supports a causal claim — the trade openness finding is the clearest case, where reverse causation and common cause are both plausible.</li>
+          </ul>
+        </section>
+
+        <nav class="cs-pager">
+          <a href="video-game-sales.html">
+            <span class="dir">Previous</span>
+            <span class="ttl">Video Game Sales SQL Analysis</span>
+          </a>
+          <a href="india-air-quality.html" class="next">
+            <span class="dir">Next case study</span>
+            <span class="ttl">India Air Quality — CPCB National AQI</span>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="year"></span> Ritika Sharma. All rights reserved.</div>
+  </footer>
+
+  <script src="../js/case-study.js?v=1"></script>
+</body>
+</html>

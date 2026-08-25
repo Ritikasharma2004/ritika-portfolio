@@ -12,3 +12,6 @@ prepros-6.config
 node_modules/
 .sass-cache/
 
+
+# Local tooling
+.claude/

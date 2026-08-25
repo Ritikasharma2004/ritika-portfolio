@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Case Studies | Ritika Sharma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Detailed write-ups of eight data analytics projects — the question, the data quality work, the real findings with real numbers, and the limits of what each dataset could support.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css?v=5">
+  <link rel="stylesheet" href="../css/case-study.css?v=1">
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="wrap">
+      <a href="../index.html" class="logo">Ritika Sharma</a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="index.html">Case Studies</a>
+        <a href="../index.html#contact">Contact</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="wrap">
+        <a href="../index.html" class="cs-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back to portfolio
+        </a>
+        <span class="eyebrow">Case Studies</span>
+        <h1>Eight projects, written up properly</h1>
+        <p class="cs-lede">Each write-up covers the same ground: the question, the data quality work that came before the analysis, the findings with the actual numbers, and an honest account of what the data <strong>could not</strong> support. Several of these projects reached a negative result — those are included in full, because knowing which questions a dataset cannot answer is most of the job.</p>
+        <div class="stat-strip">
+          <div><div class="num">8</div><div class="label">projects, end to end</div></div>
+          <div><div class="num">2.4M+</div><div class="label">rows analysed across the set</div></div>
+          <div><div class="num">4</div><div class="label">projects where the obvious answer was wrong</div></div>
+          <div><div class="num">102</div><div class="label">tests across the Python pipelines</div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="cs-body">
+      <div class="wrap" style="max-width:1120px">
+
+        <div class="cs-index-grid">
+
+          <article class="cs-index-card">
+            <div class="bar" style="background:linear-gradient(135deg,#10b981,#059669)"></div>
+            <div class="inner">
+              <h3>End-to-End Customer Analytics</h3>
+              <span class="project-date">Dec 2025 · Python, SQL, Power BI</span>
+              <p>3,900 purchase records. Subscription status turned out to be perfectly confounded with gender — no female customer subscribes — and spend is uniform noise uncorrelated with everything.</p>
+              <a href="customer-analytics.html" class="btn btn-outline">Read case study</a>
+            </div>
+          </article>
+
+          <article class="cs-index-card">
+            <div class="bar" style="background:linear-gradient(135deg,#6366f1,#4338ca)"></div>
+            <div class="inner">
+              <h3>Employee Attrition Analysis</h3>
+              <span class="project-date">Feb 2026 · Power BI, DAX, Excel</span>
+              <p>1,470 employees. Overtime raises the odds of leaving 5.3× and survives every control. The "single employees leave more" finding does not — all 470 of them have zero stock options.</p>
+              <a href="employee-attrition.html" class="btn btn-outline">Read case study</a>
+            </div>
+          </article>
+
+          <article class="cs-index-card">
+            <div class="bar" style="background:linear-gradient(135deg,#f59e0b,#b45309)"></div>
+            <div class="inner">
+              <h3>Video Game Sales SQL Analysis</h3>
+              <span class="project-date">Aug 2026 · MySQL 8.0</span>
+              <p>16,327 titles. Ten publishers hold 70.5% of the market, the top quartile of games produces 79.9% of sales, and a profiling query caught an apparent crash that was a truncated dataset.</p>
+              <a href="video-game-sales.html" class="btn btn-outline">Read case study</a>
+            </div>
+          </article>
+
+          <article class="cs-index-card">
+            <div class="bar" style="background:linear-gradient(135deg,#0ea5e9,#0c4a6e)"></div>
+            <div class="inner">
+              <h3>India Economic Indicators &amp; Forecasting</h3>
+              <span class="project-date">Aug 2026 · Python, scikit-learn, SQL</span>
+              <p>11 World Bank indicators, 1960–2025. No machine learning model beat a mean baseline — and a lag-1 autocorrelation of 0.026 explains exactly why none of them could.</p>
+              <a href="india-economic-indicators.html" class="btn btn-outline">Read case study</a>
+            </div>
+          </article>
+
+          <article class="cs-index-card">
+            <div class="bar" style="background:linear-gradient(135deg,#ef4444,#991b1b)"></div>
+            <div class="inner">
+              <h3>India Air Quality — CPCB National AQI</h3>
+              <span class="project-date">Aug 2026 · Python, SQL, Plotly</span>
+              <p>382,000 hourly readings, AQI implemented from specification. The pollutant that sets the index rotates seasonally, which changes which interventions can move it at all.</p>
+              <a href="india-air-quality.html" class="btn btn-outline">Read case study</a>
+            </div>
+          </article>
+
+          <article class="cs-index-card">
+            <div class="bar" style="background:linear-gradient(135deg,#06b6d4,#0e7490)"></div>
+            <div class="inner">
+              <h3>IPL Ball-by-Ball Analytics</h3>
+              <span class="project-date">Aug 2026 · Python, SciPy, SQL</span>
+              <p>295,557 deliveries from nested JSON. The Impact Player rule is worth +1.13 runs per over, and the toss is a coin flip while the decision after it is worth 9.4 points.</p>
+              <a href="ipl-analytics.html" class="btn btn-outline">Read case study</a>
+            </div>
+          </article>
+
+          <article class="cs-index-card">
+            <div class="bar" style="background:linear-gradient(135deg,#a855f7,#6b21a8)"></div>
+            <div class="inner">
+              <h3>Mobile Game A/B Test — Gate Placement</h3>
+              <span class="project-date">Aug 2026 · Python, SciPy, statsmodels</span>
+              <p>90,189 players. A later gate cut 7-day retention 0.82pp — and the widely-reported day-1 null result sits below the test's own detection floor, so it was never readable.</p>
+              <a href="mobile-game-ab-test.html" class="btn btn-outline">Read case study</a>
+            </div>
+          </article>
+
+          <article class="cs-index-card">
+            <div class="bar" style="background:linear-gradient(135deg,#10b981,#0ea5e9)"></div>
+            <div class="inner">
+              <h3>Chicago Bike-Share Rebalancing</h3>
+              <span class="project-date">Aug 2026 · Python, SQL, Geospatial</span>
+              <p>1.67M Divvy trips joined to dock capacity. The median station nets zero bikes a day — bikes move 6.3× more within a day than across one, so it is a timing problem.</p>
+              <a href="chicago-bike-rebalancing.html" class="btn btn-outline">Read case study</a>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="takeaway" style="margin-top:44px">
+          <h3>A note on the negative results</h3>
+          <p style="margin-bottom:0; color:#2f3846; font-size:0.97rem; line-height:1.78">Four of these eight projects report that the obvious analysis does not hold up: a forecasting study where the baseline wins, an A/B test where the famous null result is unmeasurable, a customer dataset that cannot answer its own business question, and an attrition driver that turns out to be an artifact of how the file was built. Each one is reported with the specific number that shows why. A result that says "this does not work, and here is the measurement that proves it" is more useful to a business than a confident chart built on a confound.</p>
+        </div>
+
+        <nav class="cs-pager">
+          <a href="../index.html">
+            <span class="dir">Back to</span>
+            <span class="ttl">Portfolio home</span>
+          </a>
+          <a href="../index.html#contact" class="next">
+            <span class="dir">Get in touch</span>
+            <span class="ttl">Contact</span>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="year"></span> Ritika Sharma. All rights reserved.</div>
+  </footer>
+
+  <script src="../js/case-study.js?v=1"></script>
+</body>
+</html>

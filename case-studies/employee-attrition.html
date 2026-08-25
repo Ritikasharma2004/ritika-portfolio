@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Employee Attrition — Case Study | Ritika Sharma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Power BI attrition analysis of 1,470 employees: overtime raises attrition fivefold, satisfaction behaves as a floor rather than a dial, and the marital-status finding turns out to be an artifact.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css?v=5">
+  <link rel="stylesheet" href="../css/case-study.css?v=1">
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="wrap">
+      <a href="../index.html" class="logo">Ritika Sharma</a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="index.html">Case Studies</a>
+        <a href="../index.html#contact">Contact</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="wrap">
+        <a href="index.html" class="cs-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          All case studies
+        </a>
+        <span class="eyebrow">Case Study 02</span>
+        <h1>Employee Attrition Analysis Dashboard</h1>
+        <p class="cs-lede">A Power BI dashboard over 1,470 employee records, built to find out who leaves and why. Overtime turns out to be the dominant driver and it <strong>survives every control</strong>. Two of the other headline drivers do not — one is a cliff misread as a dial, and one is an <strong>artifact of how the file was built</strong>.</p>
+        <div class="cs-meta">
+          <span>Feb 2026</span>
+          <span>Power BI · DAX · Excel</span>
+          <span>1,470 employees · 44 fields</span>
+        </div>
+        <div class="cs-hero-actions">
+          <a href="https://github.com/Ritikasharma2004/hr-attrition-dashboard" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub
+          </a>
+          <a href="#findings" class="btn btn-ghost">Jump to the findings</a>
+        </div>
+        <div class="stat-strip">
+          <div><div class="num">16.1%</div><div class="label">overall attrition (237 of 1,470)</div></div>
+          <div><div class="num">5.3×</div><div class="label">odds of leaving with overtime, after controls</div></div>
+          <div><div class="num">52.6%</div><div class="label">attrition among junior staff on overtime</div></div>
+          <div><div class="num">34.6%</div><div class="label">of all leavers sit in one 10.6% group</div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="cs-nav">
+      <div class="wrap">
+        <a href="#brief">The brief</a>
+        <a href="#data">The data</a>
+        <a href="#findings">Findings</a>
+        <a href="#artifact">The artifact</a>
+        <a href="#model">Multivariate check</a>
+        <a href="#recommend">Recommendations</a>
+        <a href="#limits">Limitations</a>
+      </div>
+    </div>
+
+    <div class="cs-body">
+      <div class="wrap">
+
+        <section class="cs-section" id="brief">
+          <h2>The brief</h2>
+          <p class="sub">Who is leaving, and which levers actually move it</p>
+          <p>HR attrition dashboards usually stop at a set of single-variable bar charts: attrition by department, by age band, by satisfaction score. Each one looks like a driver. Most of them are the same driver seen from different angles, and at least one is not a driver at all.</p>
+          <p>So the analysis was built in two passes. First the descriptive cut that the dashboard reports, then a check on whether each apparent driver <strong>survives controlling for the others</strong>. The second pass is what separates a finding from a coincidence, and it changed three of the conclusions.</p>
+        </section>
+
+        <section class="cs-section" id="data">
+          <h2>The data</h2>
+          <p class="sub">1,470 employees, 44 fields, 237 recorded departures</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Check</th><th class="num">Result</th></tr></thead>
+              <tbody>
+                <tr><td>Employees</td><td class="num">1,470</td></tr>
+                <tr><td>Attrition events</td><td class="num">237 (16.12%)</td></tr>
+                <tr><td>Duplicate employee numbers</td><td class="num hi">0</td></tr>
+                <tr><td>Nulls in core fields</td><td class="num hi">0</td></tr>
+                <tr><td>Zero-variance columns</td><td class="num lo">6 — dropped</td></tr>
+              </tbody>
+              <caption>Six columns carry one value for every row (<code class="inline">Over18</code>, <code class="inline">Employee Count</code>, <code class="inline">Standard Hours</code> and three derived helper fields). They cannot explain variation in anything and were removed before analysis.</caption>
+            </table>
+          </div>
+          <p>The class balance matters for how results are read: at 16.1% attrition, a model that predicts "nobody leaves" is 83.9% accurate. Accuracy is a useless metric here, so everything below is reported as <em>rates within groups</em> rather than model accuracy.</p>
+
+          <h3>What was built</h3>
+          <div class="method-grid">
+            <div class="method-card"><h4>Power BI report</h4><p>3 pages, 30 visuals — cards, clustered column and bar charts, donut and pie breakdowns, plus a detail table.</p></div>
+            <div class="method-card"><h4>DAX measures</h4><p><code class="inline">Total Employees</code>, <code class="inline">Total Attrition</code>, <code class="inline">Attrition Rate</code>, <code class="inline">Attrition %</code>, <code class="inline">Avg salary</code>, <code class="inline">average_jobSatisfaction</code>.</p></div>
+            <div class="method-card"><h4>Interactivity</h4><p>7 slicers. Report fields include department, job role, age band, overtime, gender, education field, marital status and tenure.</p></div>
+            <div class="method-card"><h4>Excel companion</h4><p>PivotTable workbook with KPI, rating and gender sheets driving 7 charts and 3 slicers.</p></div>
+          </div>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Headline KPI</th><th class="num">Value</th></tr></thead>
+              <tbody>
+                <tr><td>Total employees</td><td class="num">1,470</td></tr>
+                <tr><td>Attrition count</td><td class="num">237</td></tr>
+                <tr><td>Active employees</td><td class="num">1,233</td></tr>
+                <tr><td>Attrition rate</td><td class="num">16.12%</td></tr>
+                <tr><td>Average age</td><td class="num">36.92</td></tr>
+                <tr><td>Average job satisfaction</td><td class="num">2.63 / 4</td></tr>
+                <tr><td>Gender split</td><td class="num">882 male / 588 female</td></tr>
+              </tbody>
+              <caption>The dashboard reports the descriptive layer. Everything from finding 1 onwards is the second pass — testing whether each apparent driver survives controlling for the others.</caption>
+            </table>
+          </div>
+        </section>
+
+        <section class="cs-section" id="findings">
+          <h2>Findings</h2>
+
+          <div class="finding">
+            <h3><span class="n">1</span> Overtime is the strongest driver, and it holds inside every job level</h3>
+            <p>Employees working overtime leave at <strong>30.5%</strong> against <strong>10.4%</strong> for those who do not — a near-threefold gap, chi-square p &lt; 10⁻²⁰.</p>
+            <p>A gap that large invites the obvious objection: maybe overtime is just a marker for junior, underpaid roles, and seniority is doing the work. It is not. The effect appears independently <em>at every level of the hierarchy</em>:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Job level</th><th class="num">No overtime</th><th class="num">Overtime</th><th class="num">Gap</th></tr></thead>
+                <tbody>
+                  <tr><td>1 (most junior)</td><td class="num">15.8%</td><td class="num lo">52.6%</td><td class="num">+36.8pp</td></tr>
+                  <tr><td>2</td><td class="num">6.7%</td><td class="num">17.8%</td><td class="num">+11.1pp</td></tr>
+                  <tr><td>3</td><td class="num">12.3%</td><td class="num">20.6%</td><td class="num">+8.3pp</td></tr>
+                  <tr><td>4</td><td class="num">2.7%</td><td class="num">9.1%</td><td class="num">+6.4pp</td></tr>
+                  <tr><td>5 (most senior)</td><td class="num">3.9%</td><td class="num">16.7%</td><td class="num">+12.8pp</td></tr>
+                </tbody>
+                <caption>Attrition rate by overtime status, within each job level. The gap never closes and never reverses.</caption>
+              </table>
+            </div>
+            <div class="callout callout-key">
+              <span class="callout-title">Finding</span>
+              <p>Junior employees working overtime leave at <strong>52.6%</strong> — more than half the group, against a 16.1% company baseline. That group is 156 people, <strong>10.6% of headcount, but 34.6% of every departure in the file</strong>. It is the single most concentrated risk pool in the data and the one place where an intervention has the most to work with.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">2</span> Satisfaction is a floor, not a dial</h3>
+            <p>The dashboard-standard reading of a 1–4 satisfaction scale is that attrition falls steadily as satisfaction rises. For two of the four satisfaction measures, that is simply not what the data shows:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Measure</th><th class="num">Level 1</th><th class="num">Level 2</th><th class="num">Level 3</th><th class="num">Level 4</th><th>Shape</th></tr></thead>
+                <tbody>
+                  <tr><td>Job Satisfaction</td><td class="num lo">23.2%</td><td class="num">14.4%</td><td class="num">14.4%</td><td class="num">14.5%</td><td>cliff</td></tr>
+                  <tr><td>Environment Satisfaction</td><td class="num lo">25.0%</td><td class="num">14.9%</td><td class="num">13.6%</td><td class="num">14.3%</td><td>cliff</td></tr>
+                  <tr><td>Work-Life Balance</td><td class="num lo">31.2%</td><td class="num">16.9%</td><td class="num">14.2%</td><td class="num">17.6%</td><td>cliff, then up</td></tr>
+                  <tr><td>Job Involvement</td><td class="num lo">33.7%</td><td class="num">18.9%</td><td class="num">14.4%</td><td class="num hi">9.0%</td><td>true gradient</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>Job Satisfaction levels 2, 3 and 4 sit at <strong>14.4%, 14.4% and 14.5%</strong>. Those are not three points on a slope; they are the same number three times. The entire effect lives in the drop from level 1, and moving someone from "satisfied" to "very satisfied" is associated with no change whatsoever.</p>
+            <p>Job Involvement is the exception and behaves the way the scale is supposed to — a clean monotonic decline from 33.7% to 9.0% across all four levels. Work-Life Balance is stranger still: the <em>best</em> rating carries higher attrition (17.6%) than the middle one (14.2%), so the relationship is not even monotonic.</p>
+            <div class="callout callout-note">
+              <span class="callout-title">Why the shape matters operationally</span>
+              <p>A gradient justifies broad engagement spend — lift everyone a notch, get a proportional return. A cliff does not. It says the budget belongs entirely to identifying and rescuing the bottom band: 280 employees on Job Satisfaction 1, 264 on Environment Satisfaction 1. Spending on the already-satisfied majority buys nothing the data can detect.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">3</span> Attrition is front-loaded into the first two years</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Years at company</th><th class="num">Employees</th><th class="num">Leavers</th><th class="num">Rate</th></tr></thead>
+                <tbody>
+                  <tr><td>Under 1</td><td class="num">44</td><td class="num">16</td><td class="num lo">36.4%</td></tr>
+                  <tr><td>1</td><td class="num">171</td><td class="num">59</td><td class="num lo">34.5%</td></tr>
+                  <tr><td>2</td><td class="num">127</td><td class="num">27</td><td class="num">21.3%</td></tr>
+                  <tr><td>3 – 5</td><td class="num">434</td><td class="num">60</td><td class="num">13.8%</td></tr>
+                  <tr><td>6 – 10</td><td class="num">448</td><td class="num">55</td><td class="num">12.3%</td></tr>
+                  <tr><td>11 – 20</td><td class="num">180</td><td class="num">12</td><td class="num hi">6.7%</td></tr>
+                  <tr><td>Over 20</td><td class="num">66</td><td class="num">8</td><td class="num">12.1%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p><strong>31.6% of every departure happens in the first two years</strong>, from a group that is only 14.6% of headcount. Attrition then falls steadily to a low of 6.7% at 11–20 years before ticking back up past 20 years, which is most plausibly retirement rather than resignation — the data does not distinguish the two.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">4</span> Pay matters at the bottom and then stops mattering</h3>
+            <p>Median monthly income is <strong>$3,202 for leavers against $5,204 for stayers</strong> (Mann-Whitney p &lt; 10⁻¹³). But the relationship is another cliff, not a slope:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Income quintile</th><th class="num">Range</th><th class="num">Attrition</th></tr></thead>
+                <tbody>
+                  <tr><td>1 (lowest)</td><td class="num">$1,009 – $2,696</td><td class="num lo">31.3%</td></tr>
+                  <tr><td>2</td><td class="num">$2,696 – $4,229</td><td class="num">17.0%</td></tr>
+                  <tr><td>3</td><td class="num">$4,229 – $5,743</td><td class="num">10.5%</td></tr>
+                  <tr><td>4</td><td class="num">$5,743 – $9,860</td><td class="num">12.6%</td></tr>
+                  <tr><td>5 (highest)</td><td class="num">$9,860 – $19,999</td><td class="num hi">9.2%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>The bottom quintile is the outlier. Quintiles 3, 4 and 5 sit between 9.2% and 12.6%, and quintile 4 is actually <em>worse</em> than quintile 3. Nearly the whole pay effect is the gap between the lowest-paid fifth and everyone else.</p>
+            <p>Sales Representatives are the sharpest expression of this: <strong>39.8% attrition</strong>, the highest of any role, on a median income of <strong>$2,579</strong> against $4,919 across all roles, with a median tenure of two years and a median age of 30. Junior, low-paid and new — the three risk factors stacked.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">5</span> Commute distance behaves cleanly</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Distance from home</th><th class="num">Employees</th><th class="num">Attrition</th></tr></thead>
+                <tbody>
+                  <tr><td>Up to 2 miles</td><td class="num">419</td><td class="num hi">12.9%</td></tr>
+                  <tr><td>2 – 5</td><td class="num">213</td><td class="num">15.5%</td></tr>
+                  <tr><td>5 – 10</td><td class="num">394</td><td class="num">14.5%</td></tr>
+                  <tr><td>10 – 20</td><td class="num">240</td><td class="num">20.0%</td></tr>
+                  <tr><td>Over 20</td><td class="num">204</td><td class="num lo">22.1%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>Broadly monotonic, and it survives the multivariate model below. Employees living more than 20 miles out leave at 1.7× the rate of those within 2 miles.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="artifact">
+          <h2>The finding that isn't one</h2>
+          <p class="sub">Why "single employees leave twice as often" should not go on a slide</p>
+          <p>Marital status produces one of the most quotable numbers in the whole dataset:</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Marital status</th><th class="num">Employees</th><th class="num">Attrition</th></tr></thead>
+              <tbody>
+                <tr><td>Single</td><td class="num">470</td><td class="num lo">25.5%</td></tr>
+                <tr><td>Married</td><td class="num">673</td><td class="num">12.5%</td></tr>
+                <tr><td>Divorced</td><td class="num">327</td><td class="num hi">10.1%</td></tr>
+              </tbody>
+              <caption>Chi-square p &lt; 10⁻¹⁰. Single employees leave at roughly twice the married rate.</caption>
+            </table>
+          </div>
+          <p>The obvious explanation is age, so the first check was to add age to a logistic model. The effect barely moved. Adding overtime and income did not move it either. Then one column killed it outright:</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Model</th><th class="num">Odds ratio, Single</th><th class="num">p</th></tr></thead>
+              <tbody>
+                <tr><td>Single alone</td><td class="num">2.59</td><td class="num">&lt; 0.001</td></tr>
+                <tr><td>+ Age</td><td class="num">2.36</td><td class="num">&lt; 0.001</td></tr>
+                <tr><td>+ Age + Overtime</td><td class="num">2.53</td><td class="num">&lt; 0.001</td></tr>
+                <tr><td>+ Age + Overtime + log(Income)</td><td class="num">2.50</td><td class="num">&lt; 0.001</td></tr>
+                <tr class="total"><td>+ Stock option level = 0</td><td class="num">1.20</td><td class="num">0.440</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The reason is structural, and it is visible the moment the two columns are crossed:</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Marital status</th><th class="num">Share with zero stock options</th></tr></thead>
+              <tbody>
+                <tr><td>Single</td><td class="num lo">100.0% (470 of 470)</td></tr>
+                <tr><td>Married</td><td class="num">22.7%</td></tr>
+                <tr><td>Divorced</td><td class="num hi">2.4%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout callout-warn">
+            <span class="callout-title">Every single employee in the file has zero stock options</span>
+            <p>Not most — all 470. Marital status is not an independent variable here, it is a perfect proxy for stock option level, which is itself a strong and plausible retention lever. Among employees who <em>do</em> have zero stock options, married staff leave at 20.3% and single staff at 25.5% — much closer, and no longer the story.</p>
+            <p>This is a property of how the dataset was assembled rather than a fact about human behaviour. Recommending relationship-based retention policy from it would be indefensible, and it would also be a policy no HR function should implement.</p>
+          </div>
+          <p>Stock options themselves are a real signal: employees with none leave at <strong>24.4%</strong> against 9.4% at level 1 and 7.6% at level 2. That effect survives the full model at an odds ratio of 2.92 — it is the marital framing that has to go, not the underlying variable.</p>
+        </section>
+
+        <section class="cs-section" id="model">
+          <h2>Multivariate check</h2>
+          <p class="sub">Which drivers survive when they all compete</p>
+          <p>A logistic regression on 15 predictors, to see which effects are independent and which are echoes of each other. Odds ratios above 1 raise the probability of leaving.</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Predictor</th><th class="num">Odds ratio</th><th class="num">p</th><th>Verdict</th></tr></thead>
+              <tbody>
+                <tr><td>Overtime</td><td class="num lo">5.30</td><td class="num">&lt; 0.001</td><td>survives — dominant</td></tr>
+                <tr><td>Job involvement = 1</td><td class="num">3.58</td><td class="num">&lt; 0.001</td><td>survives</td></tr>
+                <tr><td>Work-life balance = 1</td><td class="num">3.02</td><td class="num">&lt; 0.001</td><td>survives</td></tr>
+                <tr><td>No stock options</td><td class="num">2.92</td><td class="num">&lt; 0.001</td><td>survives</td></tr>
+                <tr><td>Environment satisfaction = 1</td><td class="num">2.57</td><td class="num">&lt; 0.001</td><td>survives</td></tr>
+                <tr><td>Frequent business travel</td><td class="num">2.38</td><td class="num">&lt; 0.001</td><td>survives</td></tr>
+                <tr><td>Job satisfaction = 1</td><td class="num">1.87</td><td class="num">0.001</td><td>survives</td></tr>
+                <tr><td>Number of prior employers</td><td class="num">1.19</td><td class="num">&lt; 0.001</td><td>survives</td></tr>
+                <tr><td>Distance from home</td><td class="num">1.04</td><td class="num">&lt; 0.001</td><td>survives (per mile)</td></tr>
+                <tr><td>log(Monthly income)</td><td class="num hi">0.29</td><td class="num">&lt; 0.001</td><td>survives — protective</td></tr>
+                <tr><td>Age</td><td class="num hi">0.97</td><td class="num">0.017</td><td>weak, protective</td></tr>
+                <tr><td>Marital status: single</td><td class="num">1.15</td><td class="num">0.584</td><td class="lo">drops out</td></tr>
+                <tr><td>Years at company</td><td class="num">1.01</td><td class="num">0.585</td><td class="lo">drops out</td></tr>
+              </tbody>
+              <caption>Logistic regression, n = 1,470, pseudo-R² = 0.251. Two of the dashboard's apparent drivers do not survive.</caption>
+            </table>
+          </div>
+          <p><strong>Years at company drops out</strong> — but that does not contradict finding 3. Once age and total working years are in the model, "years at <em>this</em> company" adds nothing beyond them. Early tenure remains a perfectly good <em>targeting</em> rule; it is just not an independent cause.</p>
+          <div class="callout callout-warn">
+            <span class="callout-title">One coefficient to distrust</span>
+            <p>Job level and monthly income correlate at <strong>r = 0.950</strong>. With both in the model, job level flips to an odds ratio above 1 (1.59, p = 0.033) even though senior employees plainly leave <em>less</em> in the raw data. That sign flip is multicollinearity, not a discovery — the two variables are fighting over the same variance. The raw job-level rates in finding 1 are the trustworthy version.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="recommend">
+          <h2>Recommendations</h2>
+          <div class="takeaway">
+            <h3>Where the effort should go</h3>
+            <ul class="cs-list ordered">
+              <li><strong>Start with overtime among junior staff.</strong> 156 people, 10.6% of headcount, 52.6% attrition, and over a third of all departures. It is the largest, most concentrated and most directly actionable pool in the data — and overtime is a scheduling decision the company already controls.</li>
+              <li><strong>Target the bottom satisfaction band only.</strong> Because satisfaction behaves as a cliff, spend aimed at the 2-to-4 range has no measurable return. The 280 employees at Job Satisfaction 1 and 264 at Environment Satisfaction 1 are where the effect lives.</li>
+              <li><strong>Review the first-year experience.</strong> Nearly a third of departures come from employees with under two years' service. Onboarding and early-tenure management reach that group before the decision is made.</li>
+              <li><strong>Look at the lowest pay quintile as a band, not a curve.</strong> The step from quintile 1 to 2 is worth 14 percentage points of attrition; every step above that is worth almost nothing. Sales Representatives at $2,579 median are the concrete case.</li>
+              <li><strong>Drop marital status from the dashboard.</strong> It measures stock option level. Report stock options instead — same signal, defensible framing, and an actual lever.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="cs-section" id="limits">
+          <h2>Limitations</h2>
+          <ul class="cs-list">
+            <li><strong>Cross-sectional, not longitudinal.</strong> Every field is measured at one point in time, including satisfaction. A departing employee's low satisfaction score may have been recorded <em>because</em> they had already decided to leave. Direction of causation is not established anywhere in this analysis.</li>
+            <li><strong>No leaving reason and no voluntary/involuntary split.</strong> Resignations, redundancies and retirements are pooled into one flag, which is the most likely explanation for the uptick past 20 years' tenure.</li>
+            <li><strong>Some effects are structural rather than behavioural.</strong> The marital status / stock option nesting is a documented example. Others may exist in fields not stress-tested here.</li>
+            <li><strong>237 events across 15 predictors.</strong> That is roughly 16 events per variable — adequate for the model reported, but thin for adding interaction terms, which is why none are included.</li>
+            <li><strong>Job level and income are near-collinear (r = 0.950)</strong>, so their individual coefficients should not be read separately. Their combined contribution is sound.</li>
+          </ul>
+        </section>
+
+        <nav class="cs-pager">
+          <a href="customer-analytics.html">
+            <span class="dir">Previous</span>
+            <span class="ttl">End-to-End Customer Analytics</span>
+          </a>
+          <a href="video-game-sales.html" class="next">
+            <span class="dir">Next case study</span>
+            <span class="ttl">Video Game Sales SQL Analysis</span>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="year"></span> Ritika Sharma. All rights reserved.</div>
+  </footer>
+
+  <script src="../js/case-study.js?v=1"></script>
+</body>
+</html>

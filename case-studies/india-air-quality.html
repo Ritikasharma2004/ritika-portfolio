@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>India Air Quality — Case Study | Ritika Sharma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CPCB National AQI computed from specification over 382,000 hourly readings across 12 Indian cities. The pollutant that sets the index rotates seasonally, which changes which interventions can move it.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css?v=5">
+  <link rel="stylesheet" href="../css/case-study.css?v=1">
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="wrap">
+      <a href="../index.html" class="logo">Ritika Sharma</a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="index.html">Case Studies</a>
+        <a href="../index.html#contact">Contact</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="wrap">
+        <a href="index.html" class="cs-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          All case studies
+        </a>
+        <span class="eyebrow">Case Study 05</span>
+        <h1>India Air Quality — CPCB National AQI</h1>
+        <p class="cs-lede">382,000 hourly pollutant readings turned into 15,936 city-days across 12 cities, with India's official CPCB AQI <strong>implemented from the specification</strong> rather than taken pre-calculated. Because AQI is the <em>maximum</em> of pollutant sub-indices, the pollutant that sets it rotates through the year — which changes which interventions could move the index at all.</p>
+        <div class="cs-meta">
+          <span>Aug 2026</span>
+          <span>Python · pandas · SQL · Plotly · Streamlit</span>
+          <span>15,936 city-days · Jan 2023 – Aug 2026</span>
+        </div>
+        <div class="cs-hero-actions">
+          <a href="https://github.com/Ritikasharma2004/india-air-quality" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub
+          </a>
+          <a href="#findings" class="btn btn-ghost">Jump to the findings</a>
+        </div>
+        <div class="stat-strip">
+          <div><div class="num">237</div><div class="label">Delhi's mean AQI — 2.0× Bengaluru</div></div>
+          <div><div class="num">1.1%</div><div class="label">of Delhi days in a safe CPCB band</div></div>
+          <div><div class="num">8.5%</div><div class="label">stubble-window rise on the plain — the smallest of any zone</div></div>
+          <div><div class="num">20</div><div class="label">tests pinning the AQI implementation</div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="cs-nav">
+      <div class="wrap">
+        <a href="#brief">The brief</a>
+        <a href="#method">Method</a>
+        <a href="#findings">Findings</a>
+        <a href="#stubble">The stubble trap</a>
+        <a href="#diwali">Diwali</a>
+        <a href="#recommend">Recommendations</a>
+        <a href="#limits">Limitations</a>
+      </div>
+    </div>
+
+    <div class="cs-body">
+      <div class="wrap">
+
+        <section class="cs-section" id="brief">
+          <h2>The brief</h2>
+          <p class="sub">Which interventions could actually move India's air quality index?</p>
+          <p>Air quality reporting in India is dominated by two narratives: winter smog and stubble burning. Both are about particulates. This project asked whether the data supports the framing — and found that the answer depends entirely on a property of the AQI formula that most analyses skip past.</p>
+          <div class="callout callout-note">
+            <span class="callout-title">The formula decides the question</span>
+            <p>The CPCB National AQI is the <strong>maximum</strong> of pollutant sub-indices, not their average. So the question is never "how polluted is the air today" — it is "<em>which pollutant is worst today</em>". An intervention aimed at a pollutant that is not currently setting the index cannot move the index at all, no matter how well it works.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="method">
+          <h2>Method</h2>
+          <p class="sub">The AQI is computed here, not imported</p>
+          <p>Rather than consuming a pre-calculated index, each pollutant gets a sub-index by <strong>piecewise linear interpolation between the published CPCB breakpoints</strong>, and the day's AQI is the maximum across pollutants. Averaging windows follow the specification exactly:</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Pollutant</th><th>Averaging window</th></tr></thead>
+              <tbody>
+                <tr><td>PM2.5, PM10, NO₂, SO₂</td><td>24-hour mean</td></tr>
+                <tr><td>O₃, CO</td><td>8-hour rolling maximum</td></tr>
+              </tbody>
+              <caption>Getting the windows wrong is the most common error in AQI reproductions — an 8-hour rolling max is not a daily mean, and ozone is where the difference bites.</caption>
+            </table>
+          </div>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Stage</th><th>Script</th><th>Output</th></tr></thead>
+              <tbody>
+                <tr><td>Ingest</td><td><code class="inline">src/extract.py</code></td><td>Hourly readings, 12 cities, one CSV each</td></tr>
+                <tr><td>AQI</td><td><code class="inline">src/aqi.py</code></td><td>CPCB sub-index and AQI implementation</td></tr>
+                <tr><td>Clean</td><td><code class="inline">src/transform.py</code></td><td>Daily city panel + data quality report</td></tr>
+                <tr><td>Analyse</td><td><code class="inline">src/analysis.py</code></td><td>7 figures + findings report</td></tr>
+                <tr><td>SQL</td><td><code class="inline">src/load_db.py</code></td><td>SQLite database + 8 analysis queries</td></tr>
+                <tr><td>Dashboard</td><td><code class="inline">dashboard/app.py</code></td><td>Streamlit app, 6 tabs</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Source is the Open-Meteo Air Quality API (Copernicus CAMS reanalysis). <strong>20 tests</strong> pin the sub-index breakpoints and averaging windows, because a silent error in the AQI function would invalidate every downstream number without ever throwing.</p>
+        </section>
+
+        <section class="cs-section" id="findings">
+          <h2>Findings</h2>
+
+          <div class="finding">
+            <h3><span class="n">1</span> The gap between cities is enormous</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>City</th><th>Zone</th><th class="num">Mean AQI</th><th class="num">Worst</th><th class="num">Safe days</th></tr></thead>
+                <tbody>
+                  <tr><td>Delhi</td><td>Indo-Gangetic Plain</td><td class="num lo">237.4</td><td class="num">488</td><td class="num lo">1.1%</td></tr>
+                  <tr><td>Patna</td><td>Indo-Gangetic Plain</td><td class="num">201.1</td><td class="num">386</td><td class="num">2.6%</td></tr>
+                  <tr><td>Kanpur</td><td>Indo-Gangetic Plain</td><td class="num">196.7</td><td class="num">470</td><td class="num">2.6%</td></tr>
+                  <tr><td>Lucknow</td><td>Indo-Gangetic Plain</td><td class="num">189.4</td><td class="num">412</td><td class="num">2.3%</td></tr>
+                  <tr><td>Mumbai</td><td>Coastal</td><td class="num">182.9</td><td class="num">405</td><td class="num">34.2%</td></tr>
+                  <tr><td>Kolkata</td><td>Indo-Gangetic Plain</td><td class="num">182.6</td><td class="num">397</td><td class="num">21.8%</td></tr>
+                  <tr><td>Jaipur</td><td>Semi-arid</td><td class="num">153.5</td><td class="num">416</td><td class="num">7.8%</td></tr>
+                  <tr><td>Hyderabad</td><td>Deccan Plateau</td><td class="num">137.0</td><td class="num">285</td><td class="num">32.2%</td></tr>
+                  <tr><td>Pune</td><td>Deccan Plateau</td><td class="num">133.7</td><td class="num">303</td><td class="num">33.9%</td></tr>
+                  <tr><td>Ahmedabad</td><td>Semi-arid</td><td class="num">126.2</td><td class="num">305</td><td class="num">33.6%</td></tr>
+                  <tr><td>Chennai</td><td>Coastal</td><td class="num">119.2</td><td class="num">303</td><td class="num">38.7%</td></tr>
+                  <tr><td>Bengaluru</td><td>Deccan Plateau</td><td class="num hi">117.1</td><td class="num">302</td><td class="num hi">45.1%</td></tr>
+                </tbody>
+                <caption>"Safe days" is the share of days in the CPCB <em>Good</em> or <em>Satisfactory</em> bands.</caption>
+              </table>
+            </div>
+            <p>Delhi averages <strong>237 AQI</strong>, twice Bengaluru's 117. But the mean understates the difference — the health-relevant column is the last one. <strong>Delhi records safe air on 1.1% of days</strong> against Bengaluru's 45.1%, a 41-fold gap. Delhi also logs 87 days in the <em>Severe</em> band; six of the twelve cities log none at all.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">2</span> Geography beats everything else</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Zone</th><th class="num">Mean</th><th class="num">Median</th><th class="num">Max</th></tr></thead>
+                <tbody>
+                  <tr><td>Indo-Gangetic Plain</td><td class="num lo">201.5</td><td class="num">187.0</td><td class="num">488</td></tr>
+                  <tr><td>Coastal</td><td class="num">151.1</td><td class="num">125.0</td><td class="num">405</td></tr>
+                  <tr><td>Semi-arid</td><td class="num">139.9</td><td class="num">141.5</td><td class="num">416</td></tr>
+                  <tr><td>Deccan Plateau</td><td class="num hi">129.3</td><td class="num">133.0</td><td class="num">303</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>All four worst cities sit on the Indo-Gangetic Plain. It is walled by the Himalayas to the north, which blocks dispersal, and it suffers a winter temperature inversion that traps pollution near the ground. Coastal cities get a sea breeze the plain does not.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">3</span> Summer is worse than post-monsoon</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Season</th><th class="num">Mean AQI</th></tr></thead>
+                <tbody>
+                  <tr><td>Winter</td><td class="num lo">190.0</td></tr>
+                  <tr><td>Summer</td><td class="num">187.4</td></tr>
+                  <tr><td>Post-Monsoon</td><td class="num">177.7</td></tr>
+                  <tr><td>Monsoon</td><td class="num hi">122.1</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>Winter is worst, as expected — but summer is a close second at 187, <em>higher</em> than the post-monsoon period at 178. The public conversation about Indian air quality is almost entirely about winter smog and the October–November window, yet on this data the April-to-June air is worse than the air that gets the headlines.</p>
+            <p>The monsoon at 122 is the only genuinely clean stretch, 1.6× better than winter, because rain scavenges particulates out of the atmosphere. Finding 4 explains why summer ranks so high: it is a different pollutant.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">4</span> The AQI-determining pollutant rotates through the year</h3>
+            <p>This is the finding that reframes everything above. Share of city-days on which each pollutant <em>sets</em> the AQI, by month:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Month</th><th class="num">PM2.5</th><th class="num">PM10</th><th class="num">O₃</th><th class="num">Other</th></tr></thead>
+                <tbody>
+                  <tr><td>January</td><td class="num lo">39.0%</td><td class="num">0.0%</td><td class="num">60.9%</td><td class="num">0.1%</td></tr>
+                  <tr><td>February</td><td class="num">9.7%</td><td class="num">0.4%</td><td class="num">89.9%</td><td class="num">0.0%</td></tr>
+                  <tr><td>March</td><td class="num">2.4%</td><td class="num">8.7%</td><td class="num">88.9%</td><td class="num">0.0%</td></tr>
+                  <tr><td>April</td><td class="num">0.1%</td><td class="num">8.7%</td><td class="num">91.2%</td><td class="num">0.0%</td></tr>
+                  <tr><td>June</td><td class="num">0.1%</td><td class="num">9.4%</td><td class="num">90.4%</td><td class="num">0.1%</td></tr>
+                  <tr><td>September</td><td class="num">0.0%</td><td class="num">0.3%</td><td class="num hi">99.7%</td><td class="num">0.0%</td></tr>
+                  <tr><td>November</td><td class="num">25.6%</td><td class="num">0.1%</td><td class="num">74.4%</td><td class="num">0.0%</td></tr>
+                  <tr><td>December</td><td class="num">28.3%</td><td class="num">0.0%</td><td class="num">71.7%</td><td class="num">0.0%</td></tr>
+                </tbody>
+                <caption>Selected months. PM2.5 peaks Nov–Jan and all but vanishes Apr–Sep.</caption>
+              </table>
+            </div>
+            <ul class="cs-list">
+              <li><strong>November to January — PM2.5.</strong> Crop residue smoke, biomass burning for heat, and an inversion that traps everything near the ground.</li>
+              <li><strong>March to June — ozone and PM10.</strong> Photochemical ozone forms when sunlight acts on NOx and volatile organics, so it peaks with heat and daylight. Pre-monsoon dust storms lift PM10 across the northwest.</li>
+              <li><strong>July to October — ozone</strong>, on the overwhelming majority of days, once rain has washed the particulates out.</li>
+            </ul>
+            <div class="callout callout-warn">
+              <span class="callout-title">How much to trust the ozone share</span>
+              <p>The ozone share here is high — it sets the index on the majority of city-days in nine months of the year, and ground-station CPCB reporting attributes far more days to PM2.5 than this. Two readings are possible and this dataset cannot separate them:</p>
+              <p><strong>1.</strong> The reanalysis overstates ozone, or the CPCB 8-hour ozone breakpoints (100 µg/m³ for the Satisfactory ceiling) are easily crossed in a sunny climate, inflating the sub-index relative to what monitors record.<br>
+              <strong>2.</strong> Ground monitor networks under-sample ozone. India's monitoring estate is weighted towards particulates, so ozone-dominated days may genuinely be under-counted in official reporting.</p>
+              <p>Validating against CPCB station data is the obvious next step. Until then the honest claim is narrow: <em>in this reanalysis, ozone sets the index far more often than the public conversation implies</em>. The seasonal <strong>rotation</strong> is robust either way — PM2.5 clearly takes over in November–January and clearly does not in April–June.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">5</span> The PM2.5 problem is regional; the ozone problem is national</h3>
+            <p>Share of days on which each pollutant is the AQI-determining one, by city:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>City</th><th class="num">PM2.5</th><th class="num">PM10</th><th class="num">O₃</th></tr></thead>
+                <tbody>
+                  <tr><td>Delhi</td><td class="num lo">22.8%</td><td class="num">17.2%</td><td class="num">59.7%</td></tr>
+                  <tr><td>Patna</td><td class="num">20.9%</td><td class="num">0.1%</td><td class="num">79.0%</td></tr>
+                  <tr><td>Lucknow</td><td class="num">18.4%</td><td class="num">3.9%</td><td class="num">77.7%</td></tr>
+                  <tr><td>Kolkata</td><td class="num">17.7%</td><td class="num">0.0%</td><td class="num">82.3%</td></tr>
+                  <tr><td>Kanpur</td><td class="num">16.6%</td><td class="num">11.4%</td><td class="num">72.1%</td></tr>
+                  <tr><td>Jaipur</td><td class="num">3.2%</td><td class="num">14.7%</td><td class="num">82.2%</td></tr>
+                  <tr><td>Mumbai</td><td class="num">1.2%</td><td class="num">1.4%</td><td class="num">97.4%</td></tr>
+                  <tr><td>Ahmedabad</td><td class="num">1.1%</td><td class="num">0.7%</td><td class="num">98.3%</td></tr>
+                  <tr><td>Pune</td><td class="num">0.5%</td><td class="num">0.0%</td><td class="num">99.5%</td></tr>
+                  <tr><td>Hyderabad</td><td class="num">0.3%</td><td class="num">0.0%</td><td class="num">99.6%</td></tr>
+                  <tr><td>Chennai</td><td class="num">0.2%</td><td class="num">0.0%</td><td class="num">99.8%</td></tr>
+                  <tr><td>Bengaluru</td><td class="num hi">0.0%</td><td class="num">0.0%</td><td class="num">99.2%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>The split is sharp and follows the same geography as finding 2. PM2.5 sets the index on a meaningful share of days <strong>only in the Indo-Gangetic Plain</strong>. In the south and on the Deccan it is effectively never the binding pollutant.</p>
+            <div class="callout callout-key">
+              <span class="callout-title">Why this is the policy finding</span>
+              <p>An intervention aimed at the wrong pollutant cannot move the index. <strong>Bengaluru could eliminate its particulate emissions entirely and its AQI would barely change</strong>, because PM2.5 was setting the index on none of its days. Delhi is the only city in this sample where particulate control would move the index on more than a fifth of days.</p>
+              <p>Read alongside the ozone caveat above: the exact ozone share depends on the reanalysis being right about ozone. The <em>regional contrast</em> in PM2.5 dominance does not — that pattern holds regardless of where the ozone level sits.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="cs-section" id="stubble">
+          <h2>The stubble-burning trap</h2>
+          <p class="sub">Where the analysis had to stop short of the obvious conclusion</p>
+          <p>Comparing 15 October – 30 November against the rest of the year, by zone. The result is the opposite of what the popular framing predicts:</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Zone</th><th class="num">Stubble window</th><th class="num">Rest of year</th><th class="num">Difference</th><th class="num">% increase</th></tr></thead>
+              <tbody>
+                <tr><td>Coastal</td><td class="num">202.8</td><td class="num">144.9</td><td class="num">+57.9</td><td class="num lo">+39.9%</td></tr>
+                <tr><td>Semi-arid</td><td class="num">164.0</td><td class="num">137.0</td><td class="num">+27.0</td><td class="num">+19.7%</td></tr>
+                <tr><td>Indo-Gangetic Plain</td><td class="num">216.5</td><td class="num">199.7</td><td class="num">+16.9</td><td class="num hi">+8.5%</td></tr>
+                <tr><td>Deccan Plateau</td><td class="num">133.0</td><td class="num">128.8</td><td class="num">+4.1</td><td class="num">+3.2%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The <strong>Indo-Gangetic Plain shows the smallest relative rise</strong> while coastal cities show the largest — even though stubble burning happens in Punjab and Haryana, upwind of the plain, and not near the coast at all.</p>
+          <p>Two things explain this, and neither is that burning does not matter:</p>
+          <ul class="cs-list ordered">
+            <li><strong>A ceiling effect.</strong> The plain already averages 200 AQI for the rest of the year, so it has less headroom to rise in percentage terms — and it still records the <em>highest absolute level during the window of any zone</em>, at 216.5.</li>
+            <li><strong>The window is not a burning variable.</strong> 15 October – 30 November is also the post-monsoon transition everywhere in India: rain stops scavenging particulates, temperatures fall, winds weaken. Every zone rises in this window because the weather changes in every zone.</li>
+          </ul>
+          <div class="callout callout-warn">
+            <span class="callout-title">What this analysis cannot say</span>
+            <p>It shows that air quality deteriorates nationally in this window and that the plain stays worst in absolute terms throughout. It <strong>cannot attribute any part of that to stubble burning</strong>, because the calendar window conflates burning with the seasonal weather shift.</p>
+            <p>Separating them needs satellite fire counts and wind-direction data — neither is in this dataset. Reporting the plain's 8.5% as evidence of a burning effect, or the coast's 39.9% as evidence against one, would both be wrong.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="diwali">
+          <h2>Diwali: the comparison design changes the answer</h2>
+          <p>Two designs were run on the same question, and they disagree:</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Comparison</th><th class="num">Mean effect</th></tr></thead>
+              <tbody>
+                <tr><td>Diwali window vs the city's annual mean</td><td class="num">+12.4 AQI</td></tr>
+                <tr><td>Diwali window vs the city's own pre-Diwali baseline</td><td class="num lo">+21.5 AQI</td></tr>
+              </tbody>
+              <caption>Diwali window is day −1 to +2; the pre-Diwali baseline is two to four weeks earlier. 69% of city-year pairs show an increase.</caption>
+            </table>
+          </div>
+          <p>The own-baseline design gives the <strong>larger</strong> estimate, which is the opposite of what one might expect. The reason is that the annual mean already contains the November-to-January winter peak, so it is a high bar to clear. The two-to-four-weeks-before window falls in the cleaner October shoulder period, so the jump measured against it is bigger.</p>
+          <p><strong>Which number is right?</strong> The own-baseline design is the better one — it controls for city-specific and year-specific levels and compares against a period days away rather than months. But it does <em>not</em> control for the seasonal deterioration already under way through October and November. The +21.5 figure therefore contains both the firework effect and several weeks of ordinary seasonal worsening, and should be read as an <strong>upper bound</strong> rather than a clean estimate.</p>
+          <p>Isolating the firework contribution properly needs a same-day-of-season control — comparing against the equivalent calendar window in years when Diwali fell elsewhere. With four Diwali dates in the data, that design is not yet powered.</p>
+        </section>
+
+        <section class="cs-section" id="recommend">
+          <h2>Recommendations</h2>
+          <div class="takeaway">
+            <h3>What follows from this</h3>
+            <ul class="cs-list ordered">
+              <li><strong>Match the intervention to the binding pollutant, city by city.</strong> Construction bans, vehicle restrictions and firecracker rules all target particulates. In Bengaluru, Chennai, Pune and Hyderabad, PM2.5 sets the index on under 1% of days — those measures cannot move the number there.</li>
+              <li><strong>Take summer ozone seriously.</strong> A city that eliminated its particulate problem entirely would still record poor air through April to June, on this data. Ozone control is a different policy area — NOx and volatile organic compounds — and it is currently absent from the conversation.</li>
+              <li><strong>Report the share of safe days, not the mean AQI.</strong> Delhi's mean of 237 and Mumbai's 183 look like a difference of degree. 1.1% safe days against 34.2% is the same comparison, and it is the one that describes what living there is like.</li>
+              <li><strong>Validate the ozone share against CPCB station data</strong> before acting on it. It is the one number in this project that could plausibly be a model artifact, and it is flagged as such rather than buried.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="cs-section" id="limits">
+          <h2>Limitations</h2>
+          <ul class="cs-list">
+            <li><strong>Modelled, not measured.</strong> CAMS reanalysis assimilates satellite and ground data into an atmospheric model. It is consistent across cities in a way ground monitors are not, but it will not reproduce a specific CPCB station reading on a specific day.</li>
+            <li><strong>One grid cell per city</strong>, so intra-city variation is invisible. Delhi is not one air quality environment.</li>
+            <li><strong>Under four years of data.</strong> Enough for seasonality, not enough for trend claims. Nothing here says whether Indian air is getting better or worse.</li>
+            <li><strong>Every result is correlational.</strong> Nothing in this dataset establishes a cause — the stubble window section is the worked example of why that matters.</li>
+          </ul>
+        </section>
+
+        <nav class="cs-pager">
+          <a href="india-economic-indicators.html">
+            <span class="dir">Previous</span>
+            <span class="ttl">India Economic Indicators &amp; Forecasting</span>
+          </a>
+          <a href="ipl-analytics.html" class="next">
+            <span class="dir">Next case study</span>
+            <span class="ttl">IPL Ball-by-Ball Analytics</span>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="year"></span> Ritika Sharma. All rights reserved.</div>
+  </footer>
+
+  <script src="../js/case-study.js?v=1"></script>
+</body>
+</html>

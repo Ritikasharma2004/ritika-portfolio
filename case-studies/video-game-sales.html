@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Video Game Sales SQL — Case Study | Ritika Sharma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MySQL analysis of 16,327 game titles: market concentration, a Pareto sales distribution, Japan as a structurally different market, and the data quality check that prevented a false conclusion.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css?v=5">
+  <link rel="stylesheet" href="../css/case-study.css?v=1">
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="wrap">
+      <a href="../index.html" class="logo">Ritika Sharma</a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="index.html">Case Studies</a>
+        <a href="../index.html#contact">Contact</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="wrap">
+        <a href="index.html" class="cs-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          All case studies
+        </a>
+        <span class="eyebrow">Case Study 03</span>
+        <h1>Video Game Sales SQL Analysis</h1>
+        <p class="cs-lede">16,327 game titles across 31 platforms and 577 publishers, analysed end to end in MySQL 8.0 — from data quality checks through CTEs and window functions to business scenarios. A profiling query caught an <strong>apparent market collapse that was really a truncated dataset</strong>, before it reached any conclusion.</p>
+        <div class="cs-meta">
+          <span>Aug 2026</span>
+          <span>MySQL 8.0</span>
+          <span>16,327 titles · 1980–2020</span>
+        </div>
+        <div class="cs-hero-actions">
+          <a href="https://github.com/Ritikasharma2004/vgsales-sql-analysis" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub
+          </a>
+          <a href="#findings" class="btn btn-ghost">Jump to the findings</a>
+        </div>
+        <div class="stat-strip">
+          <div><div class="num">70.5%</div><div class="label">of the market held by 10 publishers</div></div>
+          <div><div class="num">79.9%</div><div class="label">of sales from the top quartile of titles</div></div>
+          <div><div class="num">+2.6pp</div><div class="label">the only genre Japan over-indexes on</div></div>
+          <div><div class="num">1 query</div><div class="label">that prevented a false conclusion</div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="cs-nav">
+      <div class="wrap">
+        <a href="#brief">The brief</a>
+        <a href="#quality">Data quality</a>
+        <a href="#findings">Findings</a>
+        <a href="#sql">The SQL</a>
+        <a href="#recommend">Recommendations</a>
+        <a href="#limits">Limitations</a>
+      </div>
+    </div>
+
+    <div class="cs-body">
+      <div class="wrap">
+
+        <section class="cs-section" id="brief">
+          <h2>The brief</h2>
+          <p class="sub">Where does the money in this market actually sit?</p>
+          <p>A catalogue of every charting game release from 1980 to 2020, with unit sales split by region. The commercial questions are the ones a publisher would ask before greenlighting a title: which genres return the most per release, how concentrated is the competition, and does a catalogue built for North America travel?</p>
+          <p>The whole analysis is SQL — 485 lines organised into eight sections, from profiling through aggregation, subqueries, ranking and frame-based window functions to scenario queries. It runs end to end on MySQL 8.0 without errors.</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Dimension</th><th class="num">Count</th></tr></thead>
+              <tbody>
+                <tr><td>Titles</td><td class="num">16,327</td></tr>
+                <tr><td>Platforms</td><td class="num">31</td></tr>
+                <tr><td>Genres</td><td class="num">12</td></tr>
+                <tr><td>Publishers</td><td class="num">577</td></tr>
+                <tr><td>Period</td><td class="num">1980 – 2020</td></tr>
+              </tbody>
+              <caption>Sales figures are in millions of units. Regions: North America, Europe, Japan, Other.</caption>
+            </table>
+          </div>
+        </section>
+
+        <section class="cs-section" id="quality">
+          <h2>Data quality first</h2>
+          <p class="sub">Section 1 of the script, before a single business question</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Check</th><th class="num">Result</th></tr></thead>
+              <tbody>
+                <tr><td>Missing game names or years</td><td class="num hi">None</td></tr>
+                <tr><td>Missing publishers</td><td class="num">136 rows marked <code class="inline">N/A</code></td></tr>
+                <tr><td>Regional sales summing to global</td><td class="num hi">Zero mismatches</td></tr>
+                <tr><td>Duplicate titles</td><td class="num">1</td></tr>
+                <tr><td>Release year after 2017</td><td class="num">1 row</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The internal consistency check is the one worth calling out: <code class="inline">NA + EU + JP + Other</code> reconciles to <code class="inline">Global_Sales</code> on every one of the 16,327 rows. That means regional shares can be computed and compared without a rounding caveat attached to every number — which the Japan analysis below depends on entirely.</p>
+
+          <div class="callout callout-warn">
+            <span class="callout-title">The trap: 2016 is not a market crash</span>
+            <p>Aggregate sales by year and the chart falls off a cliff after 2015. Read at face value, that is a dramatic finding — the games market collapsing by more than 90% in a single year.</p>
+            <p>It is an artifact. The dataset was <strong>compiled during 2016</strong>, so that year holds a few months of releases against twelve months for every other year, and 2017–2020 are near-empty. Nothing collapsed; the data simply stops.</p>
+            <p>Every trend query in the script is therefore bounded <code class="inline">where year between 1980 and 2016</code>, and the 2016 endpoint is read as incomplete rather than as a decline. A year-over-year growth query without that bound would have reported roughly −90% for the final year and invited exactly the wrong conclusion.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="findings">
+          <h2>Findings</h2>
+
+          <div class="finding">
+            <h3><span class="n">1</span> The market is extraordinarily concentrated</h3>
+            <p>A running total over publisher sales, ordered by size, gives the cumulative market share curve:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th class="num">Rank</th><th>Publisher</th><th class="num">Sales (M units)</th><th class="num">Cumulative share</th></tr></thead>
+                <tbody>
+                  <tr><td class="num">1</td><td>Nintendo</td><td class="num">1,784.4</td><td class="num hi">20.2%</td></tr>
+                  <tr><td class="num">2</td><td>Electronic Arts</td><td class="num">1,093.4</td><td class="num">32.6%</td></tr>
+                  <tr><td class="num">3</td><td>Activision</td><td class="num">721.4</td><td class="num">40.8%</td></tr>
+                  <tr><td class="num">4</td><td>Sony Computer Entertainment</td><td class="num">607.3</td><td class="num">47.7%</td></tr>
+                  <tr><td class="num">5</td><td>Ubisoft</td><td class="num">473.5</td><td class="num">53.1%</td></tr>
+                  <tr class="total"><td class="num">10</td><td>— top ten combined —</td><td class="num">—</td><td class="num">70.5%</td></tr>
+                </tbody>
+                <caption>Ten publishers out of 577 hold seven tenths of all units sold.</caption>
+              </table>
+            </div>
+            <p><strong>Nintendo alone holds 20.2%</strong> — more than Electronic Arts and Activision combined. The remaining 567 publishers share under 30% of the market between them.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">2</span> Sales follow a Pareto distribution, so averages lie</h3>
+            <p>Splitting all 16,327 titles into quartiles by units sold, using <code class="inline">NTILE(4)</code>:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Quartile</th><th class="num">Games</th><th class="num">Sales range (M)</th><th class="num">Share of all sales</th></tr></thead>
+                <tbody>
+                  <tr><td>1 (lowest)</td><td class="num">4,082</td><td class="num">0.01 – 0.06</td><td class="num">1.5%</td></tr>
+                  <tr><td>2</td><td class="num">4,082</td><td class="num">0.06 – 0.17</td><td class="num">5.1%</td></tr>
+                  <tr><td>3</td><td class="num">4,082</td><td class="num">0.17 – 0.48</td><td class="num">13.6%</td></tr>
+                  <tr><td>4 (highest)</td><td class="num">4,081</td><td class="num">0.48 – 82.74</td><td class="num lo">79.9%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout callout-key">
+              <span class="callout-title">Why this changes the reporting</span>
+              <p>The top quarter of titles produces four fifths of all sales, and the top title sells 82.74M against a bottom-quartile ceiling of 0.06M — a spread of more than a thousandfold. On a distribution shaped like that, <strong>mean sales per game is a meaningless summary statistic</strong>: it describes no actual game and is driven almost entirely by a handful of outliers. Medians and quartile shares are reported instead wherever the distribution is being described.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">3</span> Japan is a structurally different market</h3>
+            <p>Comparing each genre's share of Japanese sales against its share of North American sales. If the two markets had the same taste, every difference would be near zero. They do not:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Genre</th><th class="num">Japan share − NA share</th></tr></thead>
+                <tbody>
+                  <tr><td>Role-Playing</td><td class="num hi">+2.6pp</td></tr>
+                  <tr><td>Strategy</td><td class="num">−10.8pp</td></tr>
+                  <tr><td>Fighting</td><td class="num">−30.1pp</td></tr>
+                  <tr><td>Action</td><td class="num">−40.8pp</td></tr>
+                  <tr><td>Shooter</td><td class="num lo">−52.3pp</td></tr>
+                </tbody>
+                <caption>Role-Playing is the single genre where Japan over-indexes against North America.</caption>
+              </table>
+            </div>
+            <p>Every genre sells a smaller share in Japan than in North America except one. Shooters — the backbone of the Western release calendar — under-index by <strong>52.3 percentage points</strong>, while Role-Playing is the only category Japan buys more of.</p>
+            <p>The implication for a publisher is concrete: a Japanese launch strategy needs a <em>different catalogue</em>, not a translated one. Localising a shooter-heavy slate targets the genre Japan buys least.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">4</span> Volume and efficiency rank in opposite directions</h3>
+            <p>Action is the biggest genre by total sales at 1,722.9M units, which makes it look like the safest bet. That ranking is an artifact of release volume — 3,253 Action titles exist, far more than any other genre. Per title, the order inverts:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Genre</th><th class="num">Games released</th><th class="num">Avg sales per game (M)</th></tr></thead>
+                <tbody>
+                  <tr><td>Platform</td><td class="num">876</td><td class="num hi">0.947</td></tr>
+                  <tr><td>Shooter</td><td class="num">1,282</td><td class="num">0.800</td></tr>
+                  <tr><td>Action</td><td class="num">3,253</td><td class="num">0.530</td></tr>
+                  <tr><td>Adventure</td><td class="num">1,276</td><td class="num lo">0.184</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p><strong>Platform titles sell 1.8× as well per release as Action titles</strong> despite a quarter of the release volume. The sharpest contrast is Shooter against Adventure: near-identical release counts (1,282 and 1,276), but Shooter averages 4.3× the units per title.</p>
+            <p>Total sales answers "where is the market", average sales per title answers "what is a release here worth". A greenlight decision needs the second question, and the two produce almost opposite rankings.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="sql">
+          <h2>The SQL</h2>
+          <p class="sub">Eight sections, 485 lines, MySQL 8.0</p>
+          <p>The market concentration curve in finding 1 is a chained CTE with two window functions — a running total ordered by size, and a whole-partition total to divide against:</p>
+          <div class="cs-code"><pre><span class="c">-- How concentrated is the market?
+-- Running total of publisher sales as a share of the whole market.</span>
+<span class="k">with</span> publisher_totals <span class="k">as</span> (
+    <span class="k">select</span> publisher, <span class="k">sum</span>(global_sales) <span class="k">as</span> total_sales
+    <span class="k">from</span> vgsales
+    <span class="k">group by</span> publisher
+),
+ranked <span class="k">as</span> (
+    <span class="k">select</span> publisher, total_sales,
+           <span class="k">sum</span>(total_sales) <span class="k">over</span> (<span class="k">order by</span> total_sales <span class="k">desc</span>
+                                  <span class="k">rows between unbounded preceding and current row</span>) <span class="k">as</span> running_total,
+           <span class="k">sum</span>(total_sales) <span class="k">over</span> () <span class="k">as</span> market_total,
+           <span class="k">row_number</span>() <span class="k">over</span> (<span class="k">order by</span> total_sales <span class="k">desc</span>) <span class="k">as</span> publisher_rank
+    <span class="k">from</span> publisher_totals
+)
+<span class="k">select</span> publisher_rank,
+       publisher,
+       <span class="k">round</span>(total_sales,<span class="s">2</span>) <span class="k">as</span> total_sales,
+       <span class="k">round</span>(<span class="s">100</span> * running_total / market_total,<span class="s">2</span>) <span class="k">as</span> cumulative_market_pct
+<span class="k">from</span> ranked
+<span class="k">where</span> publisher_rank &lt;= <span class="s">20</span>
+<span class="k">order by</span> publisher_rank;</pre></div>
+          <p>Year-over-year growth uses <code class="inline">LAG</code> with a <code class="inline">NULLIF</code> guard against division by zero, and the year bound that keeps the incomplete 2016 tail out of the trend:</p>
+          <div class="cs-code"><pre><span class="c">-- Year-over-year growth rate, not just the difference.</span>
+<span class="k">with</span> yearly <span class="k">as</span> (
+    <span class="k">select</span> year, <span class="k">sum</span>(global_sales) <span class="k">as</span> sales
+    <span class="k">from</span> vgsales
+    <span class="k">where</span> year <span class="k">between</span> <span class="s">1980</span> <span class="k">and</span> <span class="s">2016</span>
+    <span class="k">group by</span> year
+)
+<span class="k">select</span> year,
+       <span class="k">round</span>(sales,<span class="s">2</span>) <span class="k">as</span> sales,
+       <span class="k">round</span>(<span class="k">lag</span>(sales) <span class="k">over</span> (<span class="k">order by</span> year),<span class="s">2</span>) <span class="k">as</span> prev_year,
+       <span class="k">round</span>(<span class="s">100</span> * (sales - <span class="k">lag</span>(sales) <span class="k">over</span> (<span class="k">order by</span> year))
+             / <span class="k">nullif</span>(<span class="k">lag</span>(sales) <span class="k">over</span> (<span class="k">order by</span> year),<span class="s">0</span>),<span class="s">1</span>) <span class="k">as</span> growth_pct
+<span class="k">from</span> yearly
+<span class="k">order by</span> year;</pre></div>
+          <p>A three-year moving average with an explicit frame smooths out the console launch cycle, which otherwise dominates any year-on-year read:</p>
+          <div class="cs-code"><pre><span class="k">select</span> year,
+       <span class="k">round</span>(sales,<span class="s">2</span>) <span class="k">as</span> sales,
+       <span class="k">round</span>(<span class="k">avg</span>(sales) <span class="k">over</span> (<span class="k">order by</span> year
+                          <span class="k">rows between</span> <span class="s">1</span> <span class="k">preceding and</span> <span class="s">1</span> <span class="k">following</span>),<span class="s">2</span>) <span class="k">as</span> moving_avg_3yr
+<span class="k">from</span> yearly
+<span class="k">order by</span> year;</pre></div>
+          <div class="method-grid">
+            <div class="method-card"><h4>Aggregation</h4><p><code class="inline">GROUP BY</code>, <code class="inline">HAVING</code>, conditional aggregation with <code class="inline">CASE</code>.</p></div>
+            <div class="method-card"><h4>Subqueries</h4><p>Scalar subqueries in <code class="inline">WHERE</code> and <code class="inline">SELECT</code>, derived tables.</p></div>
+            <div class="method-card"><h4>Window functions</h4><p><code class="inline">DENSE_RANK</code>, <code class="inline">RANK</code>, <code class="inline">ROW_NUMBER</code>, <code class="inline">NTILE</code>, <code class="inline">LAG</code>, <code class="inline">LEAD</code>, <code class="inline">FIRST_VALUE</code>, <code class="inline">LAST_VALUE</code>.</p></div>
+            <div class="method-card"><h4>Frames</h4><p>Running totals and moving averages with explicit <code class="inline">ROWS BETWEEN</code> clauses.</p></div>
+          </div>
+        </section>
+
+        <section class="cs-section" id="recommend">
+          <h2>Recommendations</h2>
+          <div class="takeaway">
+            <h3>What a publisher should take from this</h3>
+            <ul class="cs-list ordered">
+              <li><strong>Judge genres on sales per title, not total sales.</strong> Action leads on volume purely because it has the most releases. Platform returns 1.8× as much per title on a quarter of the output.</li>
+              <li><strong>Treat Japan as a separate catalogue decision.</strong> Role-Playing is the only genre it over-indexes on, and Shooter under-indexes by 52.3 points. Localisation does not fix a genre mismatch.</li>
+              <li><strong>Plan for a Pareto outcome.</strong> Four fifths of sales come from the top quartile of titles. A slate strategy that assumes average performance across releases is budgeting for an outcome the distribution almost never produces.</li>
+              <li><strong>Bound every trend query at 2016.</strong> The final year is a compilation artifact. Any dashboard built on this table needs that filter baked in, or it will report a collapse that never happened.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="cs-section" id="limits">
+          <h2>Limitations</h2>
+          <ul class="cs-list">
+            <li><strong>Units, not revenue.</strong> Every figure is copies sold. Price, platform royalties, development cost and margin are absent, so "sells best" is not the same as "most profitable".</li>
+            <li><strong>Charting titles only.</strong> The catalogue covers releases that charted, so the true long tail of low-selling games is under-represented — which means the Pareto concentration reported here is, if anything, understated.</li>
+            <li><strong>Physical-era data.</strong> The period is dominated by boxed retail sales. Digital distribution, free-to-play and mobile revenue are largely outside this dataset, and they are most of the modern market.</li>
+            <li><strong>136 titles have no publisher</strong> and are excluded from publisher-level aggregates, including the concentration curve.</li>
+            <li><strong>2016 onwards is incomplete</strong> by construction, so nothing in this analysis speaks to the market after 2015.</li>
+          </ul>
+        </section>
+
+        <nav class="cs-pager">
+          <a href="employee-attrition.html">
+            <span class="dir">Previous</span>
+            <span class="ttl">Employee Attrition Analysis</span>
+          </a>
+          <a href="india-economic-indicators.html" class="next">
+            <span class="dir">Next case study</span>
+            <span class="ttl">India Economic Indicators &amp; Forecasting</span>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="year"></span> Ritika Sharma. All rights reserved.</div>
+  </footer>
+
+  <script src="../js/case-study.js?v=1"></script>
+</body>
+</html>

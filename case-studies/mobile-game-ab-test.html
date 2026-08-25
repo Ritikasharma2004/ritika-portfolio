@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Mobile Game A/B Test — Case Study | Ritika Sharma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An A/B test on 90,189 mobile game players. Moving the gate later cut 7-day retention by 0.82pp — and the widely-reported day-1 null result turns out to be unmeasured rather than absent.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css?v=5">
+  <link rel="stylesheet" href="../css/case-study.css?v=1">
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="wrap">
+      <a href="../index.html" class="logo">Ritika Sharma</a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="index.html">Case Studies</a>
+        <a href="../index.html#contact">Contact</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="wrap">
+        <a href="index.html" class="cs-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          All case studies
+        </a>
+        <span class="eyebrow">Case Study 07</span>
+        <h1>Mobile Game A/B Test — Gate Placement</h1>
+        <p class="cs-lede">An experiment on <strong>90,189 players</strong> that moved a game's first progression gate from level 30 to level 40. The later gate cut 7-day retention by <strong>0.82 percentage points</strong> (−4.3% relative, p = 0.0016). The recommendation is easy. The three checks that decide what the result is <em>worth</em> are the actual work.</p>
+        <div class="cs-meta">
+          <span>Aug 2026</span>
+          <span>Python · SciPy · statsmodels · SQL</span>
+          <span>90,189 players · 14-day window</span>
+        </div>
+        <div class="cs-hero-actions">
+          <a href="https://github.com/Ritikasharma2004/mobile-game-ab-test" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub
+          </a>
+          <a href="#findings" class="btn btn-ghost">Jump to the findings</a>
+        </div>
+        <div class="stat-strip">
+          <div><div class="num">−0.82pp</div><div class="label">7-day retention, p = 0.0016</div></div>
+          <div><div class="num">0.93pp</div><div class="label">the day-1 detection floor the effect fell under</div></div>
+          <div><div class="num">96%</div><div class="label">of the engagement gap was one bot</div></div>
+          <div><div class="num">25</div><div class="label">tests pinning the statistical conventions</div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="cs-nav">
+      <div class="wrap">
+        <a href="#brief">The experiment</a>
+        <a href="#srm">Randomisation</a>
+        <a href="#findings">The result</a>
+        <a href="#power">Power</a>
+        <a href="#bot">The bot</a>
+        <a href="#filter">The filter trap</a>
+        <a href="#recommend">Recommendations</a>
+      </div>
+    </div>
+
+    <div class="cs-body">
+      <div class="wrap">
+
+        <section class="cs-section" id="brief">
+          <h2>The experiment</h2>
+          <p class="sub">Where should the first progression gate sit?</p>
+          <p>Cookie Cats shows players a <strong>gate</strong> — a forced wait, or an in-app purchase to skip it. The gate monetises, but it also interrupts, and the question is whether pushing it later lets players build enough habit to survive the interruption. Half of new installs got the gate at level 30 (control), half at level 40 (treatment). Outcomes: did the player return one day after install, and seven days after.</p>
+          <p><strong>The result: moving the gate later made retention worse, not better.</strong> That headline is the easy part, and almost every published analysis of this dataset reaches it. The four sections below are the ones that change what the result is worth.</p>
+        </section>
+
+        <section class="cs-section" id="srm">
+          <h2>Check the randomisation before reading the metrics</h2>
+          <p class="sub">This runs first because it can invalidate everything after it</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Variant</th><th class="num">Players</th><th class="num">Share</th></tr></thead>
+              <tbody>
+                <tr><td><code class="inline">gate_30</code></td><td class="num">44,700</td><td class="num">49.56%</td></tr>
+                <tr><td><code class="inline">gate_40</code></td><td class="num">45,489</td><td class="num">50.44%</td></tr>
+                <tr class="total"><td>Total</td><td class="num">90,189</td><td class="num">—</td></tr>
+              </tbody>
+              <caption>Chi-square goodness of fit against the intended 50/50 split: χ² = 6.902, <strong>p = 0.0086</strong>.</caption>
+            </table>
+          </div>
+          <p>This is a <strong>sample ratio mismatch</strong> check. If assignment is dropping users non-randomly, the retention gap measures that fault as much as it measures the gate, and no amount of rigour in the significance test recovers the experiment.</p>
+          <div class="callout callout-warn">
+            <span class="callout-title">The honest verdict: borderline, and worth writing down</span>
+            <p>The standard alerting threshold for SRM is <strong>p &lt; 0.0005</strong>, not p &lt; 0.05 — precisely because this check runs on every experiment an organisation ships, and at 0.05 one healthy test in twenty would be declared broken by chance alone.</p>
+            <p>At p = 0.0086 this does not trip the alarm, but it is not the clean 50/50 the design called for either — an imbalance of 789 players. It goes in the report rather than being quietly passed over, and the engineer who owns assignment should be asked about it before the next test runs on the same system.</p>
+          </div>
+          <h3>Row-level integrity</h3>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Check</th><th class="num">Result</th></tr></thead>
+              <tbody>
+                <tr><td>Rows</td><td class="num">90,189</td></tr>
+                <tr><td>Duplicate <code class="inline">userid</code></td><td class="num hi">0</td></tr>
+                <tr><td>Null cells</td><td class="num hi">0</td></tr>
+                <tr><td>Negative round counts</td><td class="num hi">0</td></tr>
+                <tr><td>Returned day 7 but not day 1</td><td class="num">3,599 — legitimate</td></tr>
+                <tr><td>Players who never played a round</td><td class="num">3,994 (4.43%)</td></tr>
+              </tbody>
+              <caption>The day-7-not-day-1 rows are not an error: the two flags are independent returns, not a funnel.</caption>
+            </table>
+          </div>
+        </section>
+
+        <section class="cs-section" id="findings">
+          <h2>The result</h2>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Metric</th><th class="num">gate_30</th><th class="num">gate_40</th><th class="num">Difference</th><th class="num">95% CI</th><th class="num">p</th><th>Verdict</th></tr></thead>
+              <tbody>
+                <tr><td>1-day retention</td><td class="num">44.82%</td><td class="num">44.23%</td><td class="num">−0.59pp</td><td class="num">[−1.24, +0.06]</td><td class="num">0.0744</td><td>not significant</td></tr>
+                <tr class="total"><td>7-day retention</td><td class="num">19.02%</td><td class="num">18.20%</td><td class="num lo">−0.82pp</td><td class="num">[−1.33, −0.31]</td><td class="num">0.0016</td><td>significant</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>7-day retention fell <strong>0.82 percentage points</strong>, a 4.3% relative drop. The bootstrap puts it in the terms a product decision actually needs: across <strong>10,000 resamples, gate_40 came out behind on 7-day retention in 99.9% of them</strong>, and behind on 1-day retention in 96.2%.</p>
+        </section>
+
+        <section class="cs-section" id="power">
+          <h2>The day-1 effect is unmeasured, not absent</h2>
+          <p class="sub">The finding that most analyses of this dataset get wrong</p>
+          <p>The 1-day row is where most analyses stop, conclude "no effect on day-1 retention", and move on. That conclusion is not supported, and the reason is a number the p-value does not contain.</p>
+          <div class="callout callout-key">
+            <span class="callout-title">Minimum detectable effect</span>
+            <p>At 90,189 players split roughly evenly, with a day-1 baseline of 44.82%, the <strong>minimum detectable effect at 80% power is 0.93pp</strong>. The observed effect was <strong>0.59pp — below the detection floor</strong>.</p>
+            <p>A test that cannot see a 0.6pp effect returning "not significant" on a 0.6pp effect tells us nothing about whether that effect is real. The correct statement is not "there is no day-1 effect"; it is "<em>this experiment could not have detected a day-1 effect of the size it observed, either way</em>".</p>
+          </div>
+          <p>To call an effect that size on day-1 retention would need roughly <strong>111,333 players per arm</strong> — about 2.5× the sample actually collected.</p>
+          <p>7-day retention escapes this, but not by much: its MDE is <strong>0.73pp against an observed 0.82pp</strong>. The lower baseline (19.02% against 44.82%) means less variance to fight, so the same sample buys a finer measurement. That is the whole reason one metric is readable and the other is not — it is not that the 7-day effect is "bigger" in any meaningful sense.</p>
+        </section>
+
+        <section class="cs-section" id="bot">
+          <h2>Almost the entire engagement gap was one bot</h2>
+          <p>Mean rounds played in the first 14 days: <strong>52.46 for gate_30 against 51.30 for gate_40</strong> — a gap of +1.16 rounds that looks like more evidence for the same story.</p>
+          <p>One player accounts for <strong>96% of it</strong>.</p>
+          <div class="callout callout-warn">
+            <span class="callout-title">userid 6390605</span>
+            <p>Recorded with <strong>49,854 rounds in 14 days</strong>. That is 3,561 rounds a day — one every 24 seconds, around the clock, for two weeks — and <strong>17× the next highest player</strong> in the file, who managed 2,961.</p>
+          </div>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th></th><th class="num">gate_30 mean</th><th class="num">gate_40 mean</th><th class="num">Gap</th><th class="num">Median (both)</th></tr></thead>
+              <tbody>
+                <tr><td>All players</td><td class="num">52.46</td><td class="num">51.30</td><td class="num lo">+1.16</td><td class="num">17 / 16</td></tr>
+                <tr><td>Excluding the bot</td><td class="num">51.34</td><td class="num">51.30</td><td class="num hi">+0.04</td><td class="num">17 / 16</td></tr>
+              </tbody>
+              <caption>Removing one row out of 90,189 collapses the gap to effectively nothing.</caption>
+            </table>
+          </div>
+          <p><strong>The medians never moved</strong>, which is the tell. Rounds played is heavily right-skewed, so a mean comparison on it is fragile by construction, and a t-test on that mean would be reporting the tail rather than the treatment. Mann-Whitney on the cleaned data gives <strong>p = 0.0509</strong> — right at the boundary, and a much weaker claim than the raw means suggested.</p>
+          <p>The row is flagged as <code class="inline">implausible_volume</code> rather than deleted, so the comparison can be reported both ways. The general point: <em>a difference in means that one row out of ninety thousand can erase was never a finding.</em> Checking that before reporting it costs one line of code.</p>
+        </section>
+
+        <section class="cs-section" id="filter">
+          <h2>The tempting filters make the effect bigger and the answer wrong</h2>
+          <p>A gate at level 30 cannot affect a player who never reached level 30. So the natural instinct is to drop the players it could not have touched and measure a cleaner effect on the ones it could. Doing that inflates the 7-day effect from <strong>−0.82pp to −1.78pp</strong> — more than double, and a much more publishable-looking number.</p>
+          <p>It is also invalid, and the data says so directly:</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th class="num">Reached at least</th><th class="num">gate_30 rate</th><th class="num">gate_40 rate</th><th class="num">Ratio</th></tr></thead>
+              <tbody>
+                <tr><td class="num">1 round</td><td class="num">95.67%</td><td class="num">95.48%</td><td class="num">1.0020</td></tr>
+                <tr><td class="num">10 rounds</td><td class="num">62.34%</td><td class="num">61.74%</td><td class="num">1.0096</td></tr>
+                <tr><td class="num">20 rounds</td><td class="num">46.39%</td><td class="num">45.47%</td><td class="num">1.0202</td></tr>
+                <tr class="total"><td class="num">30 rounds</td><td class="num">37.26%</td><td class="num">36.52%</td><td class="num hi">1.0203</td></tr>
+                <tr><td class="num">40 rounds</td><td class="num">30.35%</td><td class="num">30.40%</td><td class="num">0.9984</td></tr>
+                <tr><td class="num">50 rounds</td><td class="num">25.34%</td><td class="num">26.02%</td><td class="num lo">0.9741</td></tr>
+                <tr><td class="num">75 rounds</td><td class="num">18.02%</td><td class="num">18.42%</td><td class="num">0.9778</td></tr>
+                <tr><td class="num">100 rounds</td><td class="num">13.80%</td><td class="num">13.96%</td><td class="num">0.9888</td></tr>
+              </tbody>
+              <caption>If the gate had no bearing on how far players got, the ratio column would be flat. It is not.</caption>
+            </table>
+          </div>
+          <p><strong>Where it bends is the whole argument.</strong> Control runs slightly ahead of treatment through the early thresholds, peaking at <strong>1.0203 at 30 rounds</strong>. It then crosses below 1.0 between 30 and 40 and bottoms out at <strong>0.9741 by 50 rounds</strong>. The crossover sits in the window between the two gate levels — exactly where a gate at level 30 would start holding the control arm up, and nowhere a coincidence would prefer.</p>
+          <div class="callout callout-key">
+            <span class="callout-title">Why the filter breaks the experiment</span>
+            <p>"Reached level 40" is not a property of the player. It is partly an <em>outcome of the treatment</em>. Filtering on it selects a differently-composed group from each arm — the control players who got there had to push through a gate first, so they are the more determined ones — and the comparison stops being between equivalent populations.</p>
+            <p>Randomisation guaranteed balance on everything measured <em>before</em> assignment. It guarantees nothing about anything measured after it.</p>
+          </div>
+          <p>The 4.43% who never played once are kept for the same reason. They dilute the estimate toward zero, and they are the price of an unbiased one.</p>
+          <p class="sub" style="margin-top:18px">One caveat the column headings hide: <code class="inline">sum_gamerounds</code> counts rounds played, not levels cleared, and a player can replay a level. "Reached 30 rounds" is a proxy for progression, not a literal record of arriving at the gate. That is good enough for the argument being made, which turns on the <em>direction</em> the filter moves rather than its exact calibration.</p>
+        </section>
+
+        <section class="cs-section" id="recommend">
+          <h2>Recommendations</h2>
+          <div class="takeaway">
+            <h3>What to do</h3>
+            <ul class="cs-list ordered">
+              <li><strong>Keep the gate at level 30.</strong> Moving it to 40 cost 0.82pp of 7-day retention (−4.3% relative) on the only population that can be measured without bias, and nothing in the data suggests a compensating gain. The direction is consistent across both retention metrics, both the z-test and the bootstrap, and every population cut tried here.</li>
+              <li><strong>Do not read the day-1 result either way.</strong> It was underpowered by design. Detecting an effect of that size needs about 111,333 players per arm — plan the sample before running it, not after.</li>
+              <li><strong>Ask why the split came out uneven</strong> before running the next experiment on this assignment system. p = 0.0086 does not condemn this test, but it is a signal about the infrastructure.</li>
+              <li><strong>Report engagement on medians, not means.</strong> Rounds played is right-skewed enough that a single automated client moved the group mean by 96% of its apparent effect.</li>
+            </ul>
+          </div>
+        </section>
+
+        <nav class="cs-pager">
+          <a href="ipl-analytics.html">
+            <span class="dir">Previous</span>
+            <span class="ttl">IPL Ball-by-Ball Analytics</span>
+          </a>
+          <a href="chicago-bike-rebalancing.html" class="next">
+            <span class="dir">Next case study</span>
+            <span class="ttl">Chicago Bike-Share Rebalancing</span>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="year"></span> Ritika Sharma. All rights reserved.</div>
+  </footer>
+
+  <script src="../js/case-study.js?v=1"></script>
+</body>
+</html>

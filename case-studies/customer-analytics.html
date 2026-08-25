@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Customer Analytics — Case Study | Ritika Sharma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="End-to-end customer analytics on 3,900 purchase records — and the data quality work that showed which business questions the dataset could and could not answer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css?v=5">
+  <link rel="stylesheet" href="../css/case-study.css?v=1">
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="wrap">
+      <a href="../index.html" class="logo">Ritika Sharma</a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="index.html">Case Studies</a>
+        <a href="../index.html#contact">Contact</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="wrap">
+        <a href="index.html" class="cs-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          All case studies
+        </a>
+        <span class="eyebrow">Case Study 01</span>
+        <h1>End-to-End Customer Analytics</h1>
+        <p class="cs-lede">A full analytics workflow on 3,900 customer purchase records — Python for cleaning and EDA, SQL for the analysis, Power BI for the dashboard. The most valuable output was not a segmentation. It was establishing that <strong>the dataset cannot support the questions it is usually asked</strong>, and saying so before building recommendations on top of noise.</p>
+        <div class="cs-meta">
+          <span>Dec 2025</span>
+          <span>Python · Pandas · SQL · Power BI</span>
+          <span>3,900 records · 18 fields</span>
+        </div>
+        <div class="cs-hero-actions">
+          <a href="https://github.com/Ritikasharma2004/customer_behavior_analysis" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub
+          </a>
+          <a href="#quality" class="btn btn-ghost">Jump to the findings</a>
+        </div>
+        <div class="stat-strip">
+          <div><div class="num">3,900</div><div class="label">purchase records analysed</div></div>
+          <div><div class="num">$233,081</div><div class="label">total recorded revenue</div></div>
+          <div><div class="num">0 of 1,248</div><div class="label">female customers with a subscription</div></div>
+          <div><div class="num">p = 0.56</div><div class="label">purchase amount vs a uniform distribution</div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="cs-nav">
+      <div class="wrap">
+        <a href="#brief">The brief</a>
+        <a href="#data">The data</a>
+        <a href="#quality">Data quality</a>
+        <a href="#findings">Findings</a>
+        <a href="#supported">What holds up</a>
+        <a href="#recommend">Recommendations</a>
+        <a href="#limits">Limitations</a>
+      </div>
+    </div>
+
+    <div class="cs-body">
+      <div class="wrap">
+
+        <section class="cs-section" id="brief">
+          <h2>The brief</h2>
+          <p class="sub">What the analysis was supposed to answer</p>
+          <p>A retail transaction extract with demographics, product details, discount flags and a subscription indicator. The questions a business would ask of it are the obvious ones:</p>
+          <ul class="cs-list ordered">
+            <li><strong>Is the subscription programme working?</strong> Do subscribers spend more than non-subscribers?</li>
+            <li><strong>Do discounts pay for themselves?</strong> Does applying a discount raise or lower basket value?</li>
+            <li><strong>Which segments and categories drive revenue</strong>, and where should marketing spend go?</li>
+          </ul>
+          <p>The workflow was built to answer all three: load and profile in Pandas, clean, run SQL aggregations and window functions, then publish a Power BI dashboard. The profiling step is where the project changed direction.</p>
+        </section>
+
+        <section class="cs-section" id="data">
+          <h2>The data</h2>
+          <p class="sub">3,900 rows, 18 columns, one row per customer</p>
+          <div class="method-grid">
+            <div class="method-card"><h4>Load &amp; profile</h4><p>Pandas — dtypes, null audit, cardinality and distribution checks on every column.</p></div>
+            <div class="method-card"><h4>Clean</h4><p>Null handling, type conversion, category consistency checks.</p></div>
+            <div class="method-card"><h4>Analyse</h4><p>SQL — aggregation, grouping, ranking and window functions.</p></div>
+            <div class="method-card"><h4>Report</h4><p>Power BI dashboard with segment, category and region views.</p></div>
+          </div>
+          <p>Structurally the file is clean, which is why the deeper problems are easy to miss:</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Check</th><th class="num">Result</th></tr></thead>
+              <tbody>
+                <tr><td>Rows</td><td class="num">3,900</td></tr>
+                <tr><td>Duplicate rows</td><td class="num hi">0</td></tr>
+                <tr><td>Duplicate customer IDs</td><td class="num hi">0</td></tr>
+                <tr><td>Null cells</td><td class="num">37 — all in <code class="inline">Review Rating</code></td></tr>
+                <tr><td>Age range</td><td class="num">18 – 70 (mean 44.1)</td></tr>
+                <tr><td>Purchase amount range</td><td class="num">$20 – $100 (mean $59.76)</td></tr>
+                <tr><td>Distinct locations / items</td><td class="num">50 / 25</td></tr>
+              </tbody>
+              <caption>Row-level integrity passes cleanly. Nothing here signals a problem — which is the point.</caption>
+            </table>
+          </div>
+        </section>
+
+        <section class="cs-section" id="quality">
+          <h2>Data quality: three defects that change the answer</h2>
+          <p class="sub">None of these show up in a null count</p>
+
+          <div class="finding">
+            <h3><span class="n">1</span> Two columns are the same column</h3>
+            <p><code class="inline">Discount Applied</code> and <code class="inline">Promo Code Used</code> agree on <strong>all 3,900 rows</strong> — 1,677 Yes, 2,223 No, zero disagreements in either direction.</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Discount Applied ↓ / Promo Code Used →</th><th class="num">No</th><th class="num">Yes</th></tr></thead>
+                <tbody>
+                  <tr><td>No</td><td class="num">2,223</td><td class="num">0</td></tr>
+                  <tr><td>Yes</td><td class="num">0</td><td class="num">1,677</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>They are not two levers, they are one field recorded twice. Any model or dashboard treating them as separate inputs is double-counting a single effect, and any claim that "promo codes outperform general discounts" is unanswerable here.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">2</span> Subscription is perfectly confounded with gender</h3>
+            <p>This is the defect that invalidates the headline business question.</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Gender</th><th class="num">Subscribers</th><th class="num">Non-subscribers</th><th class="num">Received a discount</th></tr></thead>
+                <tbody>
+                  <tr><td>Female</td><td class="num lo">0</td><td class="num">1,248</td><td class="num lo">0</td></tr>
+                  <tr><td>Male</td><td class="num">1,053</td><td class="num">1,599</td><td class="num">1,677</td></tr>
+                </tbody>
+                <caption>Not one of the 1,248 female customers holds a subscription or received a discount.</caption>
+              </table>
+            </div>
+            <p>Every subscriber is male, and every subscriber received a discount (1,053 of 1,053). So "subscribers versus non-subscribers" is not a comparison between two customer groups. It is a comparison between <em>all men who subscribe</em> and <em>a mixture of men who don't and every woman in the file</em>.</p>
+            <div class="callout callout-warn">
+              <span class="callout-title">Why this matters</span>
+              <p>A dashboard filtered on subscription status is silently also filtering on gender and on discount. Any difference it shows could be caused by any of the three, and the data contains no way to separate them. The only honest fix is to hold gender fixed — which the findings below do.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">3</span> The frequency field has duplicate categories</h3>
+            <p><code class="inline">Frequency of Purchases</code> has seven labels, but two pairs mean the same thing:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Label</th><th class="num">Rows</th><th>Note</th></tr></thead>
+                <tbody>
+                  <tr><td>Every 3 Months</td><td class="num">584</td><td>same interval as Quarterly</td></tr>
+                  <tr><td>Quarterly</td><td class="num">563</td><td>same interval as Every 3 Months</td></tr>
+                  <tr><td>Bi-Weekly</td><td class="num">547</td><td>same interval as Fortnightly</td></tr>
+                  <tr><td>Fortnightly</td><td class="num">542</td><td>same interval as Bi-Weekly</td></tr>
+                  <tr><td>Annually</td><td class="num">572</td><td></td></tr>
+                  <tr><td>Monthly</td><td class="num">553</td><td></td></tr>
+                  <tr><td>Weekly</td><td class="num">539</td><td></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>Left as-is, a "purchase frequency" chart shows seven bars where there should be five, and splits the quarterly cohort of 1,147 customers into two apparently mid-sized groups. Collapsing the synonyms makes quarterly the single largest frequency band — a different chart with a different reading.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="findings">
+          <h2>Findings</h2>
+          <p class="sub">What happens when the confound is controlled for</p>
+
+          <div class="finding">
+            <h3><span class="n">4</span> With gender held fixed, the subscription effect disappears</h3>
+            <p>Because every subscriber is male, the only valid comparison is <em>within male customers</em>. Restricting to the 2,652 men removes gender from the picture entirely:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Male customers only</th><th class="num">n</th><th class="num">Mean spend</th><th class="num">Median</th></tr></thead>
+                <tbody>
+                  <tr><td>Subscribers</td><td class="num">1,053</td><td class="num">$59.49</td><td class="num">$60</td></tr>
+                  <tr><td>Non-subscribers</td><td class="num">1,599</td><td class="num">$59.57</td><td class="num">$60</td></tr>
+                  <tr class="total"><td>Difference</td><td class="num">—</td><td class="num">−$0.07</td><td class="num">$0</td></tr>
+                </tbody>
+                <caption>Welch's t-test p = 0.938; Mann-Whitney p = 0.952. No detectable difference.</caption>
+              </table>
+            </div>
+            <p>The same test on discounts, again within male customers, gives a difference of <strong>−$0.70 (p = 0.469)</strong> — also indistinguishable from zero.</p>
+            <div class="callout callout-key">
+              <span class="callout-title">Finding</span>
+              <p>Neither the subscription programme nor the discount flag is associated with basket value once gender is held constant. The uncontrolled comparison is not evidence of a working programme, and it is not evidence of a failing one either. It is not evidence.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">5</span> Purchase amount is uniform noise</h3>
+            <p>Having found nothing in the subscription split, the next question is whether the spend column relates to <em>anything</em>. It does not.</p>
+            <p>Purchase amount takes 81 distinct integer values spanning exactly $20 to $100, and the frequencies across those 81 values are consistent with a uniform draw — <strong>chi-square goodness of fit p = 0.56</strong>. Correlations with every plausible driver are effectively zero:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Variable</th><th class="num">Pearson r</th><th class="num">p</th></tr></thead>
+                <tbody>
+                  <tr><td>Age</td><td class="num">−0.010</td><td class="num">0.515</td></tr>
+                  <tr><td>Review Rating</td><td class="num">+0.030</td><td class="num">0.064</td></tr>
+                  <tr><td>Previous Purchases</td><td class="num">+0.008</td><td class="num">0.615</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>Group comparisons agree. One-way ANOVA on purchase amount across <strong>category p = 0.225</strong>, across <strong>all 50 locations p = 0.097</strong>. Only season crosses the 0.05 line, at <strong>p = 0.011</strong> — and with this many tests run across the dataset, roughly one nominal pass at 0.05 is what pure noise produces. It is reported here rather than promoted to a finding.</p>
+            <div class="callout callout-note">
+              <span class="callout-title">Method note</span>
+              <p>A uniform spend distribution bounded at round numbers, uncorrelated with age, loyalty and satisfaction, is the signature of synthetically generated data rather than a real transaction log. That does not make the dataset useless for demonstrating a workflow — it makes any <em>behavioural</em> conclusion drawn from it fictional.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">6</span> The state revenue ranking is sampling noise</h3>
+            <p>A natural dashboard headline: Montana leads on revenue at $5,784, Kansas trails at $3,437 — a 68% gap that looks like a clear regional story.</p>
+            <p>It is not one. Rows per state range from 63 to 96 around a mean of 78. For counts of that size, random variation alone has a standard deviation of about <strong>±8.8 customers</strong>, which is most of the observed spread. Since spend per customer is uniform noise (finding 5), state revenue is essentially <em>customer count × a constant</em> — and the ANOVA on spend across states returns <strong>p = 0.097</strong>.</p>
+            <p>Ranking 50 states on ~78 observations each and reading the top and bottom as performance is a classic small-sample trap. The correct read is that no state is distinguishable from any other.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="supported">
+          <h2>What the data <em>does</em> support</h2>
+          <p class="sub">Composition is real even when behaviour is not</p>
+          <p>Counts and shares are recorded facts, not inferences, so they stand regardless of everything above. These are reportable:</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Dimension</th><th>Composition</th></tr></thead>
+              <tbody>
+                <tr><td>Gender mix</td><td>68.0% male (2,652) / 32.0% female (1,248)</td></tr>
+                <tr><td>Category mix</td><td>Clothing 1,737 · Accessories 1,240 · Footwear 599 · Outerwear 324</td></tr>
+                <tr><td>Subscription penetration</td><td>27.0% overall — but 39.7% of men and 0% of women</td></tr>
+                <tr><td>Discount reach</td><td>43.0% of all customers</td></tr>
+                <tr><td>Season split</td><td>Near-even: Spring 999 · Fall 975 · Winter 971 · Summer 955</td></tr>
+                <tr><td>Review rating</td><td>Mean 3.75, range 2.5 – 5.0, 37 missing</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Clothing accounts for 44.5% of all transactions and Outerwear 8.3% — a genuine catalogue-mix fact a merchandising team could act on. What cannot be said is that any of these groups <em>spends</em> differently, because spend carries no signal.</p>
+        </section>
+
+        <section class="cs-section" id="recommend">
+          <h2>Recommendations</h2>
+          <div class="takeaway">
+            <h3>What I would tell the business</h3>
+            <ul class="cs-list ordered">
+              <li><strong>Do not evaluate the subscription programme on this extract.</strong> Subscription, gender and discount are perfectly entangled. The data cannot attribute an effect to any one of them, at any sample size, because no female subscriber exists to compare against.</li>
+              <li><strong>Fix the export before the next pull.</strong> Drop one of the two identical discount columns, and standardise the frequency vocabulary so Quarterly and Every 3 Months are one value.</li>
+              <li><strong>Get the fields that carry the actual signal.</strong> One row per customer with no timestamp, no order line items and no cost data cannot answer questions about repeat behaviour, basket composition or margin. Transaction-level data with dates is the minimum for the questions being asked.</li>
+              <li><strong>Report composition, not behaviour.</strong> Category mix and customer counts are solid and useful. Revenue-per-segment comparisons from this file are not.</li>
+            </ul>
+          </div>
+          <div class="callout callout-key">
+            <span class="callout-title">The transferable point</span>
+            <p>Profiling before analysing cost about twenty lines of code and changed the deliverable completely. Every one of these defects survives a null check, a duplicate check and a dtype check — the standard cleaning pass — and every one of them would have produced a confident, wrong slide.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="limits">
+          <h2>Limitations</h2>
+          <ul class="cs-list">
+            <li><strong>One row per customer, no timestamps.</strong> Nothing here supports trend, cohort or repeat-purchase analysis. <code class="inline">Previous Purchases</code> is a static count with no dates attached.</li>
+            <li><strong>No cost or margin data.</strong> Discount profitability is unanswerable even in principle — the file records revenue only.</li>
+            <li><strong>The uniformity result is inference, not documentation.</strong> The distribution is statistically indistinguishable from uniform and uncorrelated with every covariate, which strongly indicates synthetic generation. The dataset ships without provenance notes confirming it.</li>
+            <li><strong>The season result at p = 0.011 is left open.</strong> It is most consistent with multiple-testing noise, but this analysis does not formally correct for the number of tests run, so it is reported rather than dismissed outright.</li>
+          </ul>
+        </section>
+
+        <nav class="cs-pager">
+          <a href="index.html">
+            <span class="dir">Back to</span>
+            <span class="ttl">All case studies</span>
+          </a>
+          <a href="employee-attrition.html" class="next">
+            <span class="dir">Next case study</span>
+            <span class="ttl">Employee Attrition Analysis</span>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="year"></span> Ritika Sharma. All rights reserved.</div>
+  </footer>
+
+  <script src="../js/case-study.js?v=1"></script>
+</body>
+</html>

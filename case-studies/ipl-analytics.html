@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>IPL Ball-by-Ball Analytics — Case Study | Ritika Sharma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="295,557 IPL deliveries parsed from nested JSON. The Impact Player rule is worth +1.13 runs per over, the toss is a coin flip but the decision after it is not, and comparing a batter to themselves measures the wrong thing.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css?v=5">
+  <link rel="stylesheet" href="../css/case-study.css?v=1">
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="wrap">
+      <a href="../index.html" class="logo">Ritika Sharma</a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="index.html">Case Studies</a>
+        <a href="../index.html#contact">Contact</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="wrap">
+        <a href="index.html" class="cs-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          All case studies
+        </a>
+        <span class="eyebrow">Case Study 06</span>
+        <h1>IPL Ball-by-Ball Analytics</h1>
+        <p class="cs-lede">295,557 deliveries from 1,243 matches (2008–2026), parsed out of nested Cricsheet JSON into a clean analysis table with correct cricket scoring conventions applied throughout. The headline results are about the <strong>Impact Player rule</strong> and the toss — but the method finding is that the intuitive way to locate a batter's weakness measures something else entirely.</p>
+        <div class="cs-meta">
+          <span>Aug 2026</span>
+          <span>Python · SciPy · SQL · Streamlit</span>
+          <span>1,243 matches · 2008–2026</span>
+        </div>
+        <div class="cs-hero-actions">
+          <a href="https://github.com/Ritikasharma2004/ipl-analytics" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub
+          </a>
+          <a href="#findings" class="btn btn-ghost">Jump to the findings</a>
+        </div>
+        <div class="stat-strip">
+          <div><div class="num">+1.13</div><div class="label">runs per over since the Impact Player rule</div></div>
+          <div><div class="num">51.6%</div><div class="label">toss winners — p = 0.289, a coin flip</div></div>
+          <div><div class="num">54.7%</div><div class="label">win rate when choosing to field</div></div>
+          <div><div class="num">21</div><div class="label">tests pinning the scoring conventions</div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="cs-nav">
+      <div class="wrap">
+        <a href="#brief">The brief</a>
+        <a href="#conventions">Conventions</a>
+        <a href="#findings">Findings</a>
+        <a href="#method">The method finding</a>
+        <a href="#recommend">Takeaways</a>
+        <a href="#limits">Limitations</a>
+      </div>
+    </div>
+
+    <div class="cs-body">
+      <div class="wrap">
+
+        <section class="cs-section" id="brief">
+          <h2>The brief</h2>
+          <p class="sub">Nineteen seasons of ball-by-ball data, and three questions worth asking of it</p>
+          <p>Cricsheet publishes every IPL delivery as nested JSON — one file per match, with deliveries buried inside innings inside overs, and extras, wickets and replacements attached as optional sub-objects. Step one was flattening that into a single analysis table without losing the structure that makes cricket statistics correct.</p>
+          <p>Three questions followed: has scoring genuinely risen and does the 2023 Impact Player rule show up in it, is winning the toss worth anything, and can a batter's weakest phase be located from outcome data alone.</p>
+        </section>
+
+        <section class="cs-section" id="conventions">
+          <h2>Scoring conventions</h2>
+          <p class="sub">These decide every rate in the project, so they are stated rather than assumed</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Measure</th><th>Rule applied</th></tr></thead>
+              <tbody>
+                <tr><td>Balls faced (batter)</td><td>Excludes wides, includes no-balls</td></tr>
+                <tr><td>Balls bowled (bowler)</td><td>Excludes wides <em>and</em> no-balls</td></tr>
+                <tr><td>Runs conceded (bowler)</td><td>Excludes byes and leg-byes</td></tr>
+                <tr><td>Wickets (bowler)</td><td>Excludes run-outs and retirements</td></tr>
+                <tr><td>Super overs</td><td>Excluded from all per-over statistics</td></tr>
+              </tbody>
+              <caption>21 tests pin these rules, because a convention error produces plausible-looking numbers that are quietly wrong.</caption>
+            </table>
+          </div>
+          <p>The distinction matters most at the death, where wides are frequent. A bowler charged with leg-byes they did not concede, or credited with a run-out they did not take, gets an economy rate and a strike rate that no cricket analyst would recognise. Of the 295,557 total deliveries, <strong>284,465 are legal deliveries</strong> — the denominator for bowling rates.</p>
+        </section>
+
+        <section class="cs-section" id="findings">
+          <h2>Findings</h2>
+
+          <div class="finding">
+            <h3><span class="n">1</span> Scoring has risen, and the Impact Player rule is visible in it</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th class="num">Season</th><th class="num">Matches</th><th class="num">Run rate</th><th class="num">Boundary %</th><th class="num">Dot %</th><th class="num">Sixes/match</th></tr></thead>
+                <tbody>
+                  <tr><td class="num">2018</td><td class="num">60</td><td class="num">8.65</td><td class="num">18.3</td><td class="num">34.4</td><td class="num">14.5</td></tr>
+                  <tr><td class="num">2019</td><td class="num">60</td><td class="num">8.41</td><td class="num">17.6</td><td class="num">35.6</td><td class="num">13.1</td></tr>
+                  <tr><td class="num">2020</td><td class="num">60</td><td class="num">8.29</td><td class="num">16.5</td><td class="num">34.8</td><td class="num">12.2</td></tr>
+                  <tr><td class="num">2021</td><td class="num">60</td><td class="num">8.05</td><td class="num">16.1</td><td class="num">36.2</td><td class="num">11.4</td></tr>
+                  <tr><td class="num">2022</td><td class="num">74</td><td class="num">8.54</td><td class="num">18.0</td><td class="num">37.1</td><td class="num">14.4</td></tr>
+                  <tr class="total"><td class="num">2023</td><td class="num">74</td><td class="num">8.99</td><td class="num">19.3</td><td class="num">33.9</td><td class="num">15.2</td></tr>
+                  <tr><td class="num">2024</td><td class="num">71</td><td class="num">9.56</td><td class="num">21.1</td><td class="num">32.9</td><td class="num">17.8</td></tr>
+                  <tr><td class="num">2025</td><td class="num">74</td><td class="num">9.63</td><td class="num">21.6</td><td class="num">32.3</td><td class="num">17.6</td></tr>
+                  <tr><td class="num">2026</td><td class="num">74</td><td class="num hi">9.88</td><td class="num">22.6</td><td class="num">32.7</td><td class="num">19.3</td></tr>
+                </tbody>
+                <caption>The Impact Player rule was introduced in 2023 (highlighted row). Full table from 2008 in the repository.</caption>
+              </table>
+            </div>
+            <p>Run rate averaged <strong>8.39 across the five seasons before the rule and 9.52 from 2023 onwards</strong> — a rise of <strong>+1.13 runs per over</strong>. Dot balls fell from roughly 37% to 33%, and sixes per match rose from about 14 to 19.</p>
+            <p>The rule lets a side substitute a player mid-match, which in practice means batting sides field an extra specialist batter and can bat deeper without carrying the risk that used to come with it. The timing fits.</p>
+            <div class="callout callout-warn">
+              <span class="callout-title">What this is not</span>
+              <p>A rule change is not the only thing that happened in 2023. Squad composition, pitch preparation and bat technology all move too, and none of them are in this dataset. This is an <strong>association in a time series, not a controlled experiment</strong> — the rule is a plausible explanation for a real jump, not a demonstrated cause of it.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">2</span> The toss is a coin flip. The decision after it is not</h3>
+            <p>Across <strong>1,218 decided matches</strong>, the toss winner won 628 times — <strong>51.6%</strong>. A binomial test against a fair coin gives <strong>p = 0.289</strong>. Winning the toss confers no advantage distinguishable from chance.</p>
+            <p>That headline conceals the actual effect entirely:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Toss decision</th><th class="num">Matches</th><th class="num">Win rate</th></tr></thead>
+                <tbody>
+                  <tr><td>Chose to field</td><td class="num">810</td><td class="num hi">54.7%</td></tr>
+                  <tr><td>Chose to bat</td><td class="num">408</td><td class="num lo">45.3%</td></tr>
+                </tbody>
+                <caption>Chi-square p = 0.0025. A 9.4 percentage point gap.</caption>
+              </table>
+            </div>
+            <p>Captains who chose to field won <strong>54.7%</strong> against <strong>45.3%</strong> for those who chose to bat — consistent with the standard explanation that evening dew makes the ball harder to grip in the second innings, so chasing is easier. Captains appear to know this: they chose to field in 67% of matches.</p>
+            <div class="callout callout-note">
+              <span class="callout-title">The causal reading is not available</span>
+              <p>Captains do not choose at random. They field when conditions favour chasing and bat when they do not, so part of the 9.4-point gap is <em>the conditions that prompted the decision</em> rather than the decision itself. What the data supports is that the toss is not the interesting variable — the innings order is — and the headline 51.6% hides that completely.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">3</span> The three phases are different games</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Phase</th><th class="num">Balls</th><th class="num">Run rate</th><th class="num">Boundary %</th><th class="num">Dot %</th><th class="num">Balls per wicket</th></tr></thead>
+                <tbody>
+                  <tr><td>Powerplay</td><td class="num">89,153</td><td class="num">8.09</td><td class="num">20.4</td><td class="num lo">46.3</td><td class="num">24.9</td></tr>
+                  <tr><td>Middle</td><td class="num">131,526</td><td class="num">7.95</td><td class="num">14.3</td><td class="num">31.8</td><td class="num">23.0</td></tr>
+                  <tr><td>Death</td><td class="num">63,786</td><td class="num hi">10.06</td><td class="num">20.8</td><td class="num">28.4</td><td class="num lo">11.8</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>The death overs score <strong>1.3× as fast</strong> as the middle overs and cost a wicket every 11.8 balls against 23.0 — roughly twice as often.</p>
+            <p>This is why any comparison of players has to be made <em>within</em> a phase. A batter with a strike rate of 140 is unremarkable at the death and outstanding in the powerplay, and a single career strike rate hides which of those a player actually is.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">4</span> Death bowling, measured properly</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Bowler</th><th class="num">Balls</th><th class="num">Economy</th><th class="num">Dot %</th><th class="num">Boundary %</th></tr></thead>
+                <tbody>
+                  <tr><td>SP Narine</td><td class="num">1,105</td><td class="num hi">7.08</td><td class="num hi">37.4</td><td class="num">12.8</td></tr>
+                  <tr><td>SL Malinga</td><td class="num">1,117</td><td class="num">7.47</td><td class="num">31.3</td><td class="num">13.7</td></tr>
+                  <tr><td>R Ashwin</td><td class="num">601</td><td class="num">7.84</td><td class="num">29.6</td><td class="num">12.6</td></tr>
+                  <tr><td>JJ Bumrah</td><td class="num">1,423</td><td class="num">7.86</td><td class="num">31.2</td><td class="num">15.1</td></tr>
+                  <tr><td>DW Steyn</td><td class="num">634</td><td class="num">7.95</td><td class="num">34.4</td><td class="num">16.9</td></tr>
+                  <tr><td>M Pathirana</td><td class="num">402</td><td class="num">8.34</td><td class="num">31.3</td><td class="num">17.4</td></tr>
+                  <tr><td>Rashid Khan</td><td class="num">630</td><td class="num">8.57</td><td class="num">34.3</td><td class="num">17.9</td></tr>
+                </tbody>
+                <caption>Death overs only. Economy excludes byes and leg-byes, which the bowler did not concede, and excludes wides and no-balls from the denominator, which they did not legally bowl.</caption>
+              </table>
+            </div>
+            <p>Against a phase average of 10.06 runs per over, Narine's 7.08 across 1,105 deaths balls is nearly three runs an over better than the field. Both scoring corrections matter here more than anywhere else in the innings, because the death is where wides are most frequent.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="method">
+          <h2>The method finding</h2>
+          <p class="sub">Why comparing a batter to themselves finds nothing</p>
+          <p>The question "where is this batter weakest?" has an obvious approach: compute their strike rate in each phase and take the lowest. Every batter's powerplay strike rate is lower than their death strike rate, so the answer comes back "powerplay" for essentially everyone.</p>
+          <p>That is not a finding about batters. It is finding 3 again — <strong>everyone scores faster at the death</strong>, so a within-player comparison across phases is just measuring the phase effect, which is already known and identical for all players.</p>
+          <div class="callout callout-key">
+            <span class="callout-title">The fix</span>
+            <p>Compare each batter against the <strong>league average for that same phase</strong>, not against their own other phases. The question becomes "how does this batter do relative to what other batters manage in the same situation" — which is the question that was actually being asked.</p>
+          </div>
+          <p>Applied to every batter with 200+ balls in all three phases, the phase where their strike rate sits furthest below the league rate for that phase:</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Batter</th><th>Weakest phase</th><th class="num">Balls</th><th class="num">Their SR</th><th class="num">League SR</th><th class="num">Gap</th><th class="num">Dot %</th></tr></thead>
+              <tbody>
+                <tr><td>S Badrinath</td><td>Powerplay</td><td class="num">237</td><td class="num">76.8</td><td class="num">129.0</td><td class="num lo">−52.2</td><td class="num">61.2</td></tr>
+                <tr><td>MK Tiwary</td><td>Powerplay</td><td class="num">230</td><td class="num">97.4</td><td class="num">129.0</td><td class="num">−31.6</td><td class="num">51.3</td></tr>
+                <tr><td>JP Duminy</td><td>Powerplay</td><td class="num">239</td><td class="num">98.3</td><td class="num">129.0</td><td class="num">−30.7</td><td class="num">54.0</td></tr>
+                <tr><td>KD Karthik</td><td>Powerplay</td><td class="num">402</td><td class="num">98.5</td><td class="num">129.0</td><td class="num">−30.5</td><td class="num">52.2</td></tr>
+                <tr><td>JH Kallis</td><td>Middle</td><td class="num">1,012</td><td class="num">98.5</td><td class="num">128.5</td><td class="num">−30.0</td><td class="num">31.6</td></tr>
+                <tr><td>KS Williamson</td><td>Powerplay</td><td class="num">477</td><td class="num">100.4</td><td class="num">129.0</td><td class="num">−28.6</td><td class="num">50.3</td></tr>
+                <tr><td>NV Ojha</td><td>Death</td><td class="num">294</td><td class="num">139.8</td><td class="num">168.3</td><td class="num">−28.5</td><td class="num">36.4</td></tr>
+                <tr><td>SR Watson</td><td>Powerplay</td><td class="num">1,257</td><td class="num">112.6</td><td class="num">129.0</td><td class="num">−16.4</td><td class="num">51.9</td></tr>
+                <tr><td>Shubman Gill</td><td>Death</td><td class="num">304</td><td class="num">155.9</td><td class="num">168.3</td><td class="num">−12.4</td><td class="num">23.0</td></tr>
+              </tbody>
+              <caption>Note that the weakest phase is now genuinely varied — Middle and Death appear, which a within-player comparison could never produce.</caption>
+            </table>
+          </div>
+          <p>The <code class="inline">dot_pct</code> column shows most of the mechanism. Across all qualifying batter-phases, dot percentage correlates at <strong>−0.44</strong> with falling behind the league, against <strong>−0.33</strong> for survival (balls per dismissal). <strong>Strike rotation is the larger effect</strong>, but both are present — batters who fall behind tend to be playing more dot balls <em>and</em> getting out somewhat more often.</p>
+        </section>
+
+        <section class="cs-section" id="recommend">
+          <h2>Takeaways</h2>
+          <div class="takeaway">
+            <h3>What this analysis supports</h3>
+            <ul class="cs-list ordered">
+              <li><strong>Evaluate batters within a phase, against the league.</strong> A career strike rate conflates a player's role with their ability. The league-relative, phase-specific comparison is the only one that isolates the player.</li>
+              <li><strong>Coach strike rotation before power.</strong> Dot percentage is the stronger correlate of falling behind the league (−0.44) than getting out is (−0.33). The batters at the top of that table are not being dismissed too often; they are failing to score.</li>
+              <li><strong>Field first, but not because of the toss.</strong> The 9.4-point gap belongs to innings order, not to winning the coin flip — and part of it is the conditions that drove the choice.</li>
+              <li><strong>State scoring conventions before quoting any rate.</strong> Economy, strike rate and averages all depend on decisions about wides, no-balls, byes and run-outs. Two analysts using different conventions produce different numbers from identical data.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="cs-section" id="limits">
+          <h2>Limitations</h2>
+          <ul class="cs-list">
+            <li><strong>No ball-tracking data.</strong> Cricsheet records outcomes, not line, length, pace or shot type. Statements about <em>why</em> a batter struggles in a phase are not supportable here — only that they do.</li>
+            <li><strong>Bowling style is not in the data.</strong> A spin-versus-pace weakness analysis would need a separate player-attributes source joined on name, which introduces its own matching errors.</li>
+            <li><strong>Minimum-ball thresholds are judgement calls.</strong> 200 balls per phase, and 300 for the death charts, trade sample size against coverage. Different thresholds change who appears in the tables.</li>
+            <li><strong>Nineteen seasons of rule and format changes.</strong> Team counts, squad rules and playing conditions all vary across the period, so every cross-era comparison carries that caveat — including the Impact Player result.</li>
+          </ul>
+        </section>
+
+        <nav class="cs-pager">
+          <a href="india-air-quality.html">
+            <span class="dir">Previous</span>
+            <span class="ttl">India Air Quality — CPCB National AQI</span>
+          </a>
+          <a href="mobile-game-ab-test.html" class="next">
+            <span class="dir">Next case study</span>
+            <span class="ttl">Mobile Game A/B Test</span>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="year"></span> Ritika Sharma. All rights reserved.</div>
+  </footer>
+
+  <script src="../js/case-study.js?v=1"></script>
+</body>
+</html>

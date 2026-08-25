@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Chicago Bike-Share Rebalancing — Case Study | Ritika Sharma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="1.67M Divvy trips joined to station dock capacity. The obvious metric is useless — the median station nets zero bikes a day. Rebalancing is a timing problem, not a volume one.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css?v=5">
+  <link rel="stylesheet" href="../css/case-study.css?v=1">
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="wrap">
+      <a href="../index.html" class="logo">Ritika Sharma</a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="index.html">Case Studies</a>
+        <a href="../index.html#contact">Contact</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <header class="cs-hero">
+      <div class="wrap">
+        <a href="index.html" class="cs-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          All case studies
+        </a>
+        <span class="eyebrow">Case Study 08</span>
+        <h1>Chicago Bike-Share Rebalancing</h1>
+        <p class="cs-lede">1,670,686 Divvy trips across three seasons, joined to the dock capacity of every station, to answer where the rebalancing vans should go. The obvious metric turns out to be <strong>genuinely empty</strong> — the median station nets zero bikes over a full day. Bikes move <strong>6.3× more within a day than across one</strong>, so rebalancing is a timing problem, not a volume one.</p>
+        <div class="cs-meta">
+          <span>Aug 2026</span>
+          <span>Python · pandas · SQL · Geospatial</span>
+          <span>1.67M trips · Jun 2024 – Jan 2025</span>
+        </div>
+        <div class="cs-hero-actions">
+          <a href="https://github.com/Ritikasharma2004/chicago-bike-rebalancing" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            View on GitHub
+          </a>
+          <a href="#findings" class="btn btn-ghost">Jump to the findings</a>
+        </div>
+        <div class="stat-strip">
+          <div><div class="num">0 bikes</div><div class="label">median station's whole-day net flow</div></div>
+          <div><div class="num">6.3×</div><div class="label">within-day movement vs across-day drift</div></div>
+          <div><div class="num">−0.87</div><div class="label">morning vs evening net flow correlation</div></div>
+          <div><div class="num">−56%</div><div class="label">of capacity lost before 9am at a 7-dock station</div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="cs-nav">
+      <div class="wrap">
+        <a href="#brief">The brief</a>
+        <a href="#quality">Data quality</a>
+        <a href="#findings">Findings</a>
+        <a href="#stations">Which stations</a>
+        <a href="#recommend">Recommendations</a>
+        <a href="#limits">Limitations</a>
+      </div>
+    </div>
+
+    <div class="cs-body">
+      <div class="wrap">
+
+        <section class="cs-section" id="brief">
+          <h2>The brief</h2>
+          <p class="sub">Where should the rebalancing vans go, and when?</p>
+          <p>Bike-share systems drift out of balance: riders take bikes from one place and leave them in another, and an operator runs vans to move them back. The operational question is which stations to visit and at what hour.</p>
+          <p>The obvious answer is to find the stations that lose the most bikes per day and send vans there. That is the answer this project set out to produce, and the first measurement killed it.</p>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Month</th><th>Season</th><th class="num">Trips</th></tr></thead>
+              <tbody>
+                <tr><td>June 2024</td><td>Summer</td><td class="num">710,721</td></tr>
+                <tr><td>September 2024</td><td>Autumn</td><td class="num">821,276</td></tr>
+                <tr><td>January 2025</td><td>Winter</td><td class="num">138,689</td></tr>
+                <tr class="total"><td>Total</td><td></td><td class="num">1,670,686</td></tr>
+              </tbody>
+              <caption>The winter file is roughly a sixth the size of the autumn one. That is not a data problem — it is Chicago in January, and it turns out to matter operationally.</caption>
+            </table>
+          </div>
+        </section>
+
+        <section class="cs-section" id="quality">
+          <h2>Data quality</h2>
+
+          <div class="finding">
+            <h3><span class="n">1</span> The missing station names are not missing data</h3>
+            <p><strong>356,027 trips (21.3%)</strong> have no start station name. The first instinct is to treat that as broken data and drop it. That would have been wrong.</p>
+            <p>Splitting the null rate by bike type explains it immediately:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Bike type</th><th class="num">Trips with no start station</th></tr></thead>
+                <tbody>
+                  <tr><td><code class="inline">classic_bike</code></td><td class="num hi">0.0%</td></tr>
+                  <tr><td><code class="inline">electric_bike</code></td><td class="num">35.0%</td></tr>
+                  <tr><td><code class="inline">electric_scooter</code></td><td class="num lo">46.9%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout callout-key">
+              <span class="callout-title">The nulls are a product feature</span>
+              <p>Classic bikes have to be locked into a dock, so they never lack a station. E-bikes and scooters can be left at the kerb, so they often do. A third of trips have no station because the vehicles are <strong>dockless by design</strong>, not because the data is broken.</p>
+              <p>This matters because rebalancing is a question about docks. Only <strong>1,132,800 trips (67.8%)</strong> start <em>and</em> end at a dock, and those are the only ones that move a bike from one dock to another. Every station-level number in this project is computed on that subset — <strong>1,120,275 trips</strong> after the validity flags below — and the rest stay in the table so the size of what was set aside remains visible.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">2</span> Trips that are not really trips</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Check</th><th class="num">Trips</th><th>Treatment</th></tr></thead>
+                <tbody>
+                  <tr><td>Same dock, under 2 minutes</td><td class="num">12,043</td><td>Flagged as failed docking, excluded from rates</td></tr>
+                  <tr><td>Under 1 minute</td><td class="num">40,744</td><td>Flagged, excluded</td></tr>
+                  <tr><td>Over 24 hours</td><td class="num">2,031</td><td>Flagged, excluded</td></tr>
+                  <tr><td>Negative duration</td><td class="num hi">0</td><td>None found</td></tr>
+                  <tr><td>Coordinates outside Chicago</td><td class="num">23</td><td>Distance left null</td></tr>
+                  <tr><td>Missing coordinates</td><td class="num">1,938</td><td>Distance left null</td></tr>
+                  <tr><td>Duplicate <code class="inline">ride_id</code></td><td class="num hi">0</td><td>—</td></tr>
+                </tbody>
+                <caption>After all of it, 1,622,757 trips (97.1%) are usable for rates and averages. Nothing is deleted — <code class="inline">usable</code> is a column, so any number can be recomputed with the flag off.</caption>
+              </table>
+            </div>
+            <p>The failed dockings are the interesting one. A trip that starts and ends at the same dock inside two minutes is someone pulling a bike out and pushing it straight back, usually because it is broken. Counted as trips, they inflate a station's turnover without a bike ever going anywhere.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">3</span> Dock capacity comes from a live feed</h3>
+            <p><strong>1,517 of 1,627 stations</strong> in the trip data could be matched to a capacity in the GBFS feed. The mismatch is expected: the feed is live and describes the network today, while the trips run from June 2024 to January 2025, and stations get added, retired and renamed in between.</p>
+            <p>Unmatched stations keep a null capacity rather than a guessed one, and every capacity-relative figure skips them and states how many it skipped.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="findings">
+          <h2>Findings</h2>
+
+          <div class="finding">
+            <h3><span class="n">4</span> The number I expected to use is useless</h3>
+            <p>The obvious first measurement is each station's net flow over a day: bikes arriving minus bikes leaving. If a station keeps losing bikes, send a van.</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Whole-day net flow, across 25,657 station-days</th><th class="num">Value</th></tr></thead>
+                <tbody>
+                  <tr><td>Median</td><td class="num lo">0 bikes</td></tr>
+                  <tr><td>Mean</td><td class="num">−0.02 bikes</td></tr>
+                  <tr><td>Station-days where net movement is within 10% of turnover</td><td class="num">72%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>For 72% of station-days, almost everything that leaves comes back. That is not a small effect that needs a better test — <strong>it is the signal being genuinely absent</strong>, and accepting that rather than assuming something had been grouped wrong took a while.</p>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">5</span> The movement is all inside the day</h3>
+            <p>Splitting the day into five windows and measuring net flow in each one tells a completely different story:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Measure</th><th class="num">Bikes, average station</th></tr></thead>
+                <tbody>
+                  <tr><td>Whole-day net drift</td><td class="num">81</td></tr>
+                  <tr><td>Sum of the within-day swings</td><td class="num lo">509</td></tr>
+                </tbody>
+                <caption>A 6.3× difference, across 571 stations.</caption>
+              </table>
+            </div>
+            <p>And the swings are not spread through the day. They sit in the two commute windows:</p>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Window</th><th class="num">Average size of net flow</th></tr></thead>
+                <tbody>
+                  <tr><td>Night</td><td class="num">25</td></tr>
+                  <tr><td>Morning</td><td class="num lo">197</td></tr>
+                  <tr><td>Midday</td><td class="num">79</td></tr>
+                  <tr><td>Evening</td><td class="num">162</td></tr>
+                  <tr><td>Late</td><td class="num">45</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">6</span> Morning and evening are the same trip, reversed</h3>
+            <p>Across the 366 busiest stations, morning net flow and evening net flow correlate at <strong>−0.87</strong>.</p>
+            <p>A correlation that strong and that negative means the two peaks are one movement seen twice: the bikes that leave a residential street at eight in the morning are the same bikes coming back at six. <strong>Nothing needs trucking overnight, because the riders do the rebalancing themselves on the way home.</strong></p>
+            <div class="callout callout-note">
+              <span class="callout-title">The commute reading is testable, and it passes</span>
+              <p>On weekdays trips peak at 17:00 with a second bump at 08:00; at weekends the morning peak simply is not there. Members take <strong>19.7%</strong> of their weekday trips in the 7–9am window against <strong>11.4%</strong> for casual riders, and casual trips run <strong>1.5× longer</strong> at the median. One group is going to work; the other is going for a ride.</p>
+            </div>
+          </div>
+
+          <div class="finding">
+            <h3><span class="n">7</span> Winter is a different network</h3>
+            <div class="cs-table">
+              <table>
+                <thead><tr><th>Season</th><th class="num">Trips per day</th><th class="num">Median trip</th></tr></thead>
+                <tbody>
+                  <tr><td>Autumn</td><td class="num">17,132</td><td class="num">10.3 min</td></tr>
+                  <tr><td>Summer</td><td class="num">15,766</td><td class="num">11.9 min</td></tr>
+                  <tr><td>Winter</td><td class="num lo">3,138</td><td class="num">7.1 min</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>January runs <strong>5.5× quieter</strong> than autumn, and the trips that do happen are shorter. Whatever van schedule comes out of this cannot be a single fixed rota — the peak it is chasing is several times smaller for a third of the year.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="stations">
+          <h2>So which stations actually need a van</h2>
+          <p class="sub">Measured against the station's own docks, not against raw volume</p>
+          <p>The right measurement is the morning swing <strong>as a share of the station's own dock capacity</strong>. Four bikes is nothing at a fifty-dock station and is most of a seven-dock one. Over 66 weekdays:</p>
+
+          <h3>Empties every morning — van should arrive before 7am</h3>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Station</th><th class="num">Bikes lost per weekday</th><th class="num">Docks</th><th class="num">Share of capacity</th></tr></thead>
+              <tbody>
+                <tr><td>Sedgwick St &amp; Webster Ave</td><td class="num">−3.9</td><td class="num">7</td><td class="num lo">−56%</td></tr>
+                <tr><td>Clark St &amp; Lincoln Ave</td><td class="num">−5.4</td><td class="num">15</td><td class="num">−36%</td></tr>
+                <tr><td>Wells St &amp; Polk St</td><td class="num">−6.5</td><td class="num">19</td><td class="num">−34%</td></tr>
+                <tr><td>MLK Jr Dr &amp; 29th St</td><td class="num">−6.4</td><td class="num">19</td><td class="num">−34%</td></tr>
+                <tr><td>Calumet Ave &amp; 33rd St</td><td class="num">−3.7</td><td class="num">11</td><td class="num">−33%</td></tr>
+                <tr><td>Michigan Ave &amp; 14th St</td><td class="num">−6.3</td><td class="num">19</td><td class="num">−33%</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Fills every morning — docks run out for arriving riders</h3>
+          <div class="cs-table">
+            <table>
+              <thead><tr><th>Station</th><th class="num">Bikes gained per weekday</th><th class="num">Docks</th><th class="num">Share of capacity</th></tr></thead>
+              <tbody>
+                <tr><td>Clark St &amp; Lake St</td><td class="num">+12.9</td><td class="num">24</td><td class="num lo">+54%</td></tr>
+                <tr><td>University Ave &amp; 57th St</td><td class="num">+15.9</td><td class="num">31</td><td class="num">+51%</td></tr>
+                <tr><td>Franklin St &amp; Lake St</td><td class="num">+19.9</td><td class="num">40</td><td class="num">+50%</td></tr>
+                <tr><td>Franklin St &amp; Monroe St</td><td class="num">+20.4</td><td class="num">48</td><td class="num">+43%</td></tr>
+                <tr><td>Sangamon St &amp; Lake St</td><td class="num">+9.8</td><td class="num">24</td><td class="num">+41%</td></tr>
+                <tr><td>State St &amp; 33rd St</td><td class="num">+6.1</td><td class="num">15</td><td class="num">+41%</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-key">
+            <span class="callout-title">Why capacity is the denominator that matters</span>
+            <p><strong>Sedgwick St &amp; Webster Ave</strong> is the clearest case: it loses 3.9 bikes on an average weekday morning from only <strong>7 docks</strong>, so more than half the station empties before nine. Ranked on raw bikes lost it would not appear anywhere near the top of the list, because a small station <em>cannot</em> lose many bikes in absolute terms.</p>
+            <p>The fills are the mirror image and are just as much of a problem, for the opposite reason: a rider arriving downtown at half past eight finds no free dock and has to keep riding.</p>
+          </div>
+        </section>
+
+        <section class="cs-section" id="recommend">
+          <h2>Recommendations</h2>
+          <div class="takeaway">
+            <h3>What I would actually recommend</h3>
+            <ul class="cs-list ordered">
+              <li><strong>Dispatch against the morning swing as a share of capacity, not against daily net flow.</strong> Daily net flow is close to zero everywhere and ranks stations by how busy they are rather than how stranded they get.</li>
+              <li><strong>Move vans before 7am, not overnight.</strong> The evening commute already returns the bikes for free. Anything trucked at 2am is work the riders were going to do anyway.</li>
+              <li><strong>Watch the small stations.</strong> The worst cases by share of capacity are stations with 7 to 19 docks that never appear in a raw-volume ranking.</li>
+              <li><strong>Run a separate winter schedule.</strong> Five times fewer trips is not a smaller version of the same problem.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="cs-section" id="limits">
+          <h2>Limitations</h2>
+          <ul class="cs-list">
+            <li><strong>Only 68% of trips start and end at a dock.</strong> E-bikes and scooters left on the pavement are a real part of the network and none of the station numbers here see them.</li>
+            <li><strong>Dock capacity describes the network today</strong>, not the months analysed. 27 of the 366 busiest stations could not be matched and are left out of the capacity tables.</li>
+            <li><strong>Flows are visible; standing inventory is not.</strong> I never see the actual number of bikes at a station, only movements in and out. A station that empties may have started the morning full. Proving that a station truly ran dry needs the live availability feed sampled over time, which is a different project.</li>
+            <li><strong>Three months, not a full year.</strong> Enough to establish that the seasonal difference is large, not enough to build a twelve-month rota.</li>
+          </ul>
+        </section>
+
+        <nav class="cs-pager">
+          <a href="mobile-game-ab-test.html">
+            <span class="dir">Previous</span>
+            <span class="ttl">Mobile Game A/B Test</span>
+          </a>
+          <a href="index.html" class="next">
+            <span class="dir">Back to</span>
+            <span class="ttl">All case studies</span>
+          </a>
+        </nav>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">© <span id="year"></span> Ritika Sharma. All rights reserved.</div>
+  </footer>
+
+  <script src="../js/case-study.js?v=1"></script>
+</body>
+</html>
