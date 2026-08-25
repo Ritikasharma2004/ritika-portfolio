@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>Customer Analytics — Case Study | Ritika Sharma</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="End-to-end customer analytics on 3,900 purchase records — and the data quality work that showed which business questions the dataset could and could not answer.">
+  <meta name="description" content="End-to-end customer analytics on 3,900 purchase records — Python, SQL and Power BI, with the profiling work that determined how each business question could be answered.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
   <link rel="stylesheet" href="../css/main.css?v=5">
@@ -37,7 +37,7 @@
         </a>
         <span class="eyebrow">Case Study 01</span>
         <h1>End-to-End Customer Analytics</h1>
-        <p class="cs-lede">A full analytics workflow on 3,900 customer purchase records — Python for cleaning and EDA, SQL for the analysis, Power BI for the dashboard. The most valuable output was not a segmentation. It was establishing that <strong>the dataset cannot support the questions it is usually asked</strong>, and saying so before building recommendations on top of noise.</p>
+        <p class="cs-lede">A full analytics workflow on 3,900 customer purchase records — Python for cleaning and EDA, SQL for the analysis, Power BI for the dashboard. The profiling step reshaped the project: three structural properties of the extract determine which of the original questions it can answer, and which need a different data pull. Both are set out below.</p>
         <div class="cs-meta">
           <span>Dec 2025</span>
           <span>Python · Pandas · SQL · Power BI</span>
@@ -54,7 +54,7 @@
           <div><div class="num">3,900</div><div class="label">purchase records analysed</div></div>
           <div><div class="num">$233,081</div><div class="label">total recorded revenue</div></div>
           <div><div class="num">0 of 1,248</div><div class="label">female customers with a subscription</div></div>
-          <div><div class="num">p = 0.56</div><div class="label">purchase amount vs a uniform distribution</div></div>
+          <div><div class="num">p = 0.56</div><div class="label">spend distribution vs uniform — no signal</div></div>
         </div>
       </div>
     </header>
@@ -114,8 +114,8 @@
         </section>
 
         <section class="cs-section" id="quality">
-          <h2>Data quality: three defects that change the answer</h2>
-          <p class="sub">None of these show up in a null count</p>
+          <h2>Data quality: three properties that shape the analysis</h2>
+          <p class="sub">None of these show up in a null count, and each one changes how a result should be read</p>
 
           <div class="finding">
             <h3><span class="n">1</span> Two columns are the same column</h3>
@@ -134,7 +134,7 @@
 
           <div class="finding">
             <h3><span class="n">2</span> Subscription is perfectly confounded with gender</h3>
-            <p>This is the defect that invalidates the headline business question.</p>
+            <p>This one determines how the headline business question can be answered.</p>
             <div class="cs-table">
               <table>
                 <thead><tr><th>Gender</th><th class="num">Subscribers</th><th class="num">Non-subscribers</th><th class="num">Received a discount</th></tr></thead>
@@ -148,7 +148,7 @@
             <p>Every subscriber is male, and every subscriber received a discount (1,053 of 1,053). So "subscribers versus non-subscribers" is not a comparison between two customer groups. It is a comparison between <em>all men who subscribe</em> and <em>a mixture of men who don't and every woman in the file</em>.</p>
             <div class="callout callout-warn">
               <span class="callout-title">Why this matters</span>
-              <p>A dashboard filtered on subscription status is silently also filtering on gender and on discount. Any difference it shows could be caused by any of the three, and the data contains no way to separate them. The only honest fix is to hold gender fixed — which the findings below do.</p>
+              <p>A dashboard filtered on subscription status is also filtering on gender and on discount. Any difference it shows could come from any of the three, and this extract has no way to separate them. The workable fix is to hold gender fixed and compare within it — which the findings below do.</p>
             </div>
           </div>
 
@@ -194,13 +194,13 @@
             <p>The same test on discounts, again within male customers, gives a difference of <strong>−$0.70 (p = 0.469)</strong> — also indistinguishable from zero.</p>
             <div class="callout callout-key">
               <span class="callout-title">Finding</span>
-              <p>Neither the subscription programme nor the discount flag is associated with basket value once gender is held constant. The uncontrolled comparison is not evidence of a working programme, and it is not evidence of a failing one either. It is not evidence.</p>
+              <p>Once gender is held constant, neither the subscription programme nor the discount flag is associated with basket value. The uncontrolled comparison cannot settle the question either way — it reflects the group composition as much as any programme effect.</p>
             </div>
           </div>
 
           <div class="finding">
-            <h3><span class="n">5</span> Purchase amount is uniform noise</h3>
-            <p>Having found nothing in the subscription split, the next question is whether the spend column relates to <em>anything</em>. It does not.</p>
+            <h3><span class="n">5</span> Purchase amount carries no measurable signal</h3>
+            <p>With the subscription split showing nothing, the natural next check is whether the spend column relates to any other field in the extract. On every test run here, it does not.</p>
             <p>Purchase amount takes 81 distinct integer values spanning exactly $20 to $100, and the frequencies across those 81 values are consistent with a uniform draw — <strong>chi-square goodness of fit p = 0.56</strong>. Correlations with every plausible driver are effectively zero:</p>
             <div class="cs-table">
               <table>
@@ -215,15 +215,15 @@
             <p>Group comparisons agree. One-way ANOVA on purchase amount across <strong>category p = 0.225</strong>, across <strong>all 50 locations p = 0.097</strong>. Only season crosses the 0.05 line, at <strong>p = 0.011</strong> — and with this many tests run across the dataset, roughly one nominal pass at 0.05 is what pure noise produces. It is reported here rather than promoted to a finding.</p>
             <div class="callout callout-note">
               <span class="callout-title">Method note</span>
-              <p>A uniform spend distribution bounded at round numbers, uncorrelated with age, loyalty and satisfaction, is the signature of synthetically generated data rather than a real transaction log. That does not make the dataset useless for demonstrating a workflow — it makes any <em>behavioural</em> conclusion drawn from it fictional.</p>
+              <p>A spend distribution that is uniform between two round bounds and uncorrelated with age, loyalty and satisfaction is characteristic of a generated sample rather than a live transaction log. The dataset remains well suited to building and demonstrating the pipeline — profiling, cleaning, SQL, dashboard. What it will not carry is a <em>behavioural</em> conclusion about why customers spend what they spend.</p>
             </div>
           </div>
 
           <div class="finding">
-            <h3><span class="n">6</span> The state revenue ranking is sampling noise</h3>
+            <h3><span class="n">6</span> The state revenue ranking reflects sample size</h3>
             <p>A natural dashboard headline: Montana leads on revenue at $5,784, Kansas trails at $3,437 — a 68% gap that looks like a clear regional story.</p>
-            <p>It is not one. Rows per state range from 63 to 96 around a mean of 78. For counts of that size, random variation alone has a standard deviation of about <strong>±8.8 customers</strong>, which is most of the observed spread. Since spend per customer is uniform noise (finding 5), state revenue is essentially <em>customer count × a constant</em> — and the ANOVA on spend across states returns <strong>p = 0.097</strong>.</p>
-            <p>Ranking 50 states on ~78 observations each and reading the top and bottom as performance is a classic small-sample trap. The correct read is that no state is distinguishable from any other.</p>
+            <p>The gap is largely a counting artifact. Rows per state range from 63 to 96 around a mean of 78. For counts of that size, random variation alone has a standard deviation of about <strong>±8.8 customers</strong>, which is most of the observed spread. Since spend per customer is uniform noise (finding 5), state revenue is essentially <em>customer count × a constant</em> — and the ANOVA on spend across states returns <strong>p = 0.097</strong>.</p>
+            <p>Ranking 50 states on roughly 78 observations each and reading the extremes as performance is a small-sample trap worth naming. On this extract, no state is statistically distinguishable from any other.</p>
           </div>
         </section>
 
@@ -252,15 +252,15 @@
           <div class="takeaway">
             <h3>What I would tell the business</h3>
             <ul class="cs-list ordered">
-              <li><strong>Do not evaluate the subscription programme on this extract.</strong> Subscription, gender and discount are perfectly entangled. The data cannot attribute an effect to any one of them, at any sample size, because no female subscriber exists to compare against.</li>
+              <li><strong>Evaluate the subscription programme on a different extract.</strong> Subscription, gender and discount are fully entangled here, so no sample size fixes it — there is no female subscriber to compare against. A pull that includes them would answer the question directly.</li>
               <li><strong>Fix the export before the next pull.</strong> Drop one of the two identical discount columns, and standardise the frequency vocabulary so Quarterly and Every 3 Months are one value.</li>
               <li><strong>Get the fields that carry the actual signal.</strong> One row per customer with no timestamp, no order line items and no cost data cannot answer questions about repeat behaviour, basket composition or margin. Transaction-level data with dates is the minimum for the questions being asked.</li>
-              <li><strong>Report composition, not behaviour.</strong> Category mix and customer counts are solid and useful. Revenue-per-segment comparisons from this file are not.</li>
+              <li><strong>Lead with composition, and caveat behaviour.</strong> Category mix and customer counts are solid and directly useful. Revenue-per-segment comparisons from this file need the caveats above attached.</li>
             </ul>
           </div>
           <div class="callout callout-key">
             <span class="callout-title">The transferable point</span>
-            <p>Profiling before analysing cost about twenty lines of code and changed the deliverable completely. Every one of these defects survives a null check, a duplicate check and a dtype check — the standard cleaning pass — and every one of them would have produced a confident, wrong slide.</p>
+            <p>Profiling before analysing cost about twenty lines of code and changed what the deliverable could claim. Each of these properties survives a null check, a duplicate check and a dtype check — the standard cleaning pass — so each would otherwise have reached the dashboard unflagged.</p>
           </div>
         </section>
 

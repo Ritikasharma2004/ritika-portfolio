@@ -37,11 +37,11 @@
         </a>
         <span class="eyebrow">Case Studies</span>
         <h1>Eight projects, written up properly</h1>
-        <p class="cs-lede">Each write-up covers the same ground: the question, the data quality work that came before the analysis, the findings with the actual numbers, and an honest account of what the data <strong>could not</strong> support. Several of these projects reached a negative result — those are included in full, because knowing which questions a dataset cannot answer is most of the job.</p>
+        <p class="cs-lede">Each write-up covers the same ground: the question, the data quality work that came before the analysis, the findings with the actual numbers, and an honest account of what the data <strong>could not</strong> support. Several reached a negative or qualified result — those are included in full, because establishing what a dataset can and cannot settle is most of the job.</p>
         <div class="stat-strip">
           <div><div class="num">8</div><div class="label">projects, end to end</div></div>
           <div><div class="num">2.4M+</div><div class="label">rows analysed across the set</div></div>
-          <div><div class="num">4</div><div class="label">projects where the obvious answer was wrong</div></div>
+          <div><div class="num">4</div><div class="label">projects where the obvious answer did not hold</div></div>
           <div><div class="num">102</div><div class="label">tests across the Python pipelines</div></div>
         </div>
       </div>
@@ -57,7 +57,7 @@
             <div class="inner">
               <h3>End-to-End Customer Analytics</h3>
               <span class="project-date">Dec 2025 · Python, SQL, Power BI</span>
-              <p>3,900 purchase records. Subscription status turned out to be perfectly confounded with gender — no female customer subscribes — and spend is uniform noise uncorrelated with everything.</p>
+              <p>3,900 purchase records through Pandas, SQL and Power BI. Profiling showed subscription status is fully entangled with gender, which determines how the programme question can be answered.</p>
               <a href="customer-analytics.html" class="btn btn-outline">Read case study</a>
             </div>
           </article>
@@ -136,7 +136,7 @@
 
         <div class="takeaway" style="margin-top:44px">
           <h3>A note on the negative results</h3>
-          <p style="margin-bottom:0; color:#2f3846; font-size:0.97rem; line-height:1.78">Four of these eight projects report that the obvious analysis does not hold up: a forecasting study where the baseline wins, an A/B test where the famous null result is unmeasurable, a customer dataset that cannot answer its own business question, and an attrition driver that turns out to be an artifact of how the file was built. Each one is reported with the specific number that shows why. A result that says "this does not work, and here is the measurement that proves it" is more useful to a business than a confident chart built on a confound.</p>
+          <p style="margin-bottom:0; color:#2f3846; font-size:0.97rem; line-height:1.78">Four of these eight report that the obvious analysis does not hold up: a forecasting study where the baseline wins, an A/B test where the famous null result is unmeasurable, a customer extract whose key variables are entangled, and an attrition driver that turns out to be an artifact of how the file was built. Each is reported with the specific number that shows why. A result that says "this does not hold, and here is the measurement" is more useful to a business than a confident chart built on a confound.</p>
         </div>
 
         <nav class="cs-pager">
