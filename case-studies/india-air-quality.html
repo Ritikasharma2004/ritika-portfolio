@@ -113,6 +113,17 @@
             </table>
           </div>
           <p>Source is the Open-Meteo Air Quality API (Copernicus CAMS reanalysis). <strong>20 tests</strong> pin the sub-index breakpoints and averaging windows, because a silent error in the AQI function would invalidate every downstream number without ever throwing.</p>
+
+          <h3>The dashboard</h3>
+          <p>A six-tab Streamlit app over the daily panel, with city, zone and date filters that drive every view:</p>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/dashboards/air-quality-overview.png" alt="Streamlit dashboard overview tab showing AQI metrics, city leaderboard and CPCB band distribution" loading="lazy">
+            <figcaption><strong>Overview tab.</strong> Headline metrics recompute against the filter selection, so "safe days" is always the share for the cities actually selected rather than a fixed national figure.</figcaption>
+          </figure>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/dashboards/air-quality-pollutants.png" alt="Streamlit dashboard pollutants tab showing the monthly rotation between ozone and PM2.5" loading="lazy">
+            <figcaption><strong>Pollutants tab.</strong> The seasonal rotation from finding 4, and the ozone caveat carried in the app itself rather than left in a report the user will not open.</figcaption>
+          </figure>
         </section>
 
         <section class="cs-section" id="findings">
