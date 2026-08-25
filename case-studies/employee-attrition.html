@@ -100,6 +100,10 @@
           <p>The class balance matters for how results are read: at 16.1% attrition, a model that predicts "nobody leaves" is 83.9% accurate. Accuracy is a useless metric here, so everything below is reported as <em>rates within groups</em> rather than model accuracy.</p>
 
           <h3>What was built</h3>
+          <figure class="cs-figure">
+            <img src="../images/case-studies/dashboards/attrition-powerbi.png" alt="Power BI employee attrition dashboard showing KPI cards and six charts with department, education field, gender and marital status slicers" loading="lazy">
+            <figcaption><strong>Power BI report, page 1.</strong> Four DAX measures across the KPI row, six charts underneath, and four slicer groups down the left. Every figure here reconciles against the raw file — the department split (828/133, 354/92, 51/12), the age-band donut (112, 51, 38, 25, 11) and the overtime split (944/110 against 289/127) all match exactly.</figcaption>
+          </figure>
           <div class="method-grid">
             <div class="method-card"><h4>Power BI report</h4><p>3 pages, 30 visuals — cards, clustered column and bar charts, donut and pie breakdowns, plus a detail table.</p></div>
             <div class="method-card"><h4>DAX measures</h4><p><code class="inline">Total Employees</code>, <code class="inline">Total Attrition</code>, <code class="inline">Attrition Rate</code>, <code class="inline">Attrition %</code>, <code class="inline">Avg salary</code>, <code class="inline">average_jobSatisfaction</code>.</p></div>
@@ -331,7 +335,7 @@
               <li><strong>Target the bottom satisfaction band only.</strong> Because satisfaction behaves as a cliff, spend aimed at the 2-to-4 range has no measurable return. The 280 employees at Job Satisfaction 1 and 264 at Environment Satisfaction 1 are where the effect lives.</li>
               <li><strong>Review the first-year experience.</strong> Nearly a third of departures come from employees with under two years' service. Onboarding and early-tenure management reach that group before the decision is made.</li>
               <li><strong>Look at the lowest pay quintile as a band, not a curve.</strong> The step from quintile 1 to 2 is worth 14 percentage points of attrition; every step above that is worth almost nothing. Sales Representatives at $2,579 median are the concrete case.</li>
-              <li><strong>Drop marital status from the dashboard.</strong> It measures stock option level. Report stock options instead — same signal, defensible framing, and an actual lever.</li>
+              <li><strong>Replace the marital status slicer with a stock option one.</strong> Filtering the report by marital status surfaces the 25.5% against 12.5% gap, and every reading of it will be wrong — the field measures stock option level. Slicing on stock options instead shows the same signal, and points at a lever the company can actually pull.</li>
             </ul>
           </div>
         </section>
