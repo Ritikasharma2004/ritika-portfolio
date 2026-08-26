@@ -94,7 +94,7 @@
             <div class="method-card"><h4>Load &amp; profile</h4><p>Pandas — dtypes, null audit, cardinality and distribution checks on every column.</p></div>
             <div class="method-card"><h4>Clean</h4><p>Null handling, type conversion, category consistency checks.</p></div>
             <div class="method-card"><h4>Analyse</h4><p>SQL — aggregation, grouping, ranking and window functions.</p></div>
-            <div class="method-card"><h4>Report</h4><p>Power BI dashboard with segment, category and region views.</p></div>
+            <div class="method-card"><h4>Report</h4><p>Power BI — 18 visuals on one page: KPI card, subscription donut, revenue and sales by category and by age group, and four slicers.</p></div>
           </div>
           <p>Structurally the file is clean, which is why the deeper problems are easy to miss:</p>
           <div class="cs-table">
@@ -154,6 +154,7 @@
             <div class="callout callout-warn">
               <span class="callout-title">Why this matters</span>
               <p>A dashboard filtered on subscription status is also filtering on gender and on discount. Any difference it shows could come from any of the three, and this extract has no way to separate them. The workable fix is to hold gender fixed and compare within it — which the findings below do.</p>
+              <p>This is not hypothetical here. The Power BI report carries a <strong>Subscription Status slicer and a Gender slicer side by side</strong>, so setting subscription to <em>Yes</em> silently drops every female customer from all 18 visuals — the KPI card, the category charts and the age-group charts alike. The two controls look independent and are not. Setting them in the opposite order makes the report return an empty page, which is the clearest possible signal that the field is unusable on its own.</p>
             </div>
           </div>
 
