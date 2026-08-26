@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800" rel="stylesheet">
   <link rel="stylesheet" href="../css/main.css?v=5">
   <link rel="stylesheet" href="../css/case-study.css?v=1">
+  <link rel="stylesheet" href="../css/dashboard.css?v=1">
 </head>
 <body>
 
@@ -124,6 +125,16 @@
               </tbody>
               <caption>The dashboard reports the descriptive layer. Everything from finding 1 onwards is the second pass — testing whether each apparent driver survives controlling for the others.</caption>
             </table>
+          </div>
+
+          <h3>Explore it yourself</h3>
+          <p>The same data, live. Every figure below is recomputed in the browser from all 1,470 records as you change the filters — nothing is pre-baked. The dashed line marks the unfiltered company rate of 16.1%, so any bar reaching past it is a group leaving faster than the company as a whole.</p>
+          <div class="dash" id="attrition-dash" data-src="../data/attrition.json">
+            <div class="dash-empty">Loading the data…</div>
+          </div>
+          <div class="callout callout-note">
+            <h4>Try this</h4>
+            <p>Set <strong>Marital Status</strong> to <em>Single</em> and watch the rate jump to 25.5%. That is the number the dashboard was originally built to surface — and finding 5 below shows why acting on it would be a mistake. Then set <strong>Department</strong> to <em>HR</em>, <strong>Gender</strong> to <em>Female</em> and <strong>Marital Status</strong> to <em>Divorced</em>: four employees, three of whom left. A naive dashboard would report 75% attrition there. This one reports the group is too small to rate, which is the only defensible answer.</p>
           </div>
         </section>
 
@@ -371,5 +382,6 @@
   </footer>
 
   <script src="../js/case-study.js?v=1"></script>
+  <script src="../js/attrition-dashboard.js?v=1"></script>
 </body>
 </html>
